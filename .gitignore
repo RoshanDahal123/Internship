@@ -21,6 +21,9 @@ bld/
 *.user
 *.userosscache
 *.sln.docstates
+*.slnx
+*.csproj
+
 
 ##=========================================
 ## Rider / JetBrains Specific Files

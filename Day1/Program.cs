@@ -198,18 +198,141 @@ namespace MyFirstProgram
             //    Console.ReadKey();
 
             //Switch with conditions(when)
-            int score = 90;
-            string grade = score switch
-            {
-                int n when (n >= 90) => "A",
-                int n when (n >= 80) => "B",
-                int n when (n >= 60) => "C",
-                _ when score < 60 => "F",
-                _ => "Invalid score"
+            //int score = 90;
+            //string grade = score switch
+            //{
+            //    int n when (n >= 90) => "A",
+            //    int n when (n >= 80) => "B",
+            //    int n when (n >= 60) => "C",
+            //    _ when score < 60 => "F",
+            //    _ => "Invalid score"
 
-            };
-            Console.WriteLine(grade);
-            Console.ReadKey();
+            //};
+            //Console.WriteLine(grade);
+            //Console.ReadKey();
+
+            //looping in C#
+            //Console.WriteLine("Enter your name");
+            //string name = Console.ReadLine();
+
+            //while (1==1)
+            //{
+            //    Console.WriteLine(" I am in an infinite loop");
+            //    Console.ReadKey();
+            //}
+            //Console.WriteLine("HELLO " + name);
+            //Console.ReadKey();
+
+
+            //String name = "";
+            // while(name == "")
+            // {
+            //     Console.WriteLine("Enter your name");
+            //     name = Console.ReadLine();
+            // }
+            // Console.WriteLine("HELLO " + name);
+            // Console.ReadKey();
+
+            //for loops 
+
+            //for(int i = 0;i < 10; i++)
+            //{
+            //    Console.WriteLine("I am in a for loop"+ i);
+            //}
+            //Console.WriteLine("Happy birthday");
+            //Console.ReadKey();
+
+            //nested for loops
+
+            //for (int i =1; i<=5; i++)
+            //{
+            //    for (int j =1; j<= 5; j++)
+            //    {
+            //        Console.Write("* ");
+            //    }
+            //    Console.WriteLine();
+            //}
+
+            //Guessing number system
+
+
+            //Random random = new Random();
+            //bool playAgain = true;
+            //int min = 1;
+            //int max = 100;
+            //int number = 0;
+            //while (playAgain)
+            //{
+
+            //    int guess = 0;
+            //    number = random.Next(min, max + 1);
+            //    while (guess != number)
+            //    {
+            //        Console.WriteLine("Guess the secret number between 1 to 100");
+            //        guess = Convert.ToInt32(Console.ReadLine());
+            //        Console.WriteLine("You guessed: " + guess);
+            //        if (guess == number)
+            //        {
+            //            Console.WriteLine("You guessed the secret number!");
+            //            Console.WriteLine("Hurray!!!!!!");
+            //            playAgain = false;
+
+            //        }
+            //        else if (guess < number)
+            //        {
+            //            Console.WriteLine("Your guess is too low.");
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("Your guess is too high.");
+            //        }
+            //    }
+
+            //    Console.WriteLine("Do you want to play again? (y/n)"); 
+            //    string response= Console.ReadLine();
+            //    if (response.ToLower() == "y")
+            //    {
+            //        playAgain = true;
+            //    }
+            //    else
+            //    {
+            //        playAgain = false;
+            //    }
+            //}
+
+
+            //Make a calculator program
+
+           do{
+            Console.WriteLine("Enter your first number:a");
+            int a = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Enter your second number:b");
+            int b = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("Enter the operation you want to perform (+, -, *, /)");
+            char Operator = Convert.ToChar(Console.ReadKey().KeyChar);
+
+                string Result = Operator switch
+                {
+                    '+' => (a + b).ToString(),
+                    '-' => (a - b).ToString(),
+                    '*' => (a * b).ToString(),
+                    '/' => (a / b).ToString(),
+                    _ => "Invalid operation"
+                };
+                Console.WriteLine();
+                Console.WriteLine("Result: " + Result);
+                Console.WriteLine("Do you want to perform another operation? (y/n)");
+                
+            }while (Console.ReadLine().ToLower() == "y") ;
+            
+
+           
+
+
+
+
+
         }
     }
 }
