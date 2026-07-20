@@ -107,6 +107,8 @@
 
 
 using System;
+using System.Net.Http.Headers;
+using System.Security.AccessControl;
 namespace MyFirstProgram
 {
     class Program
@@ -303,36 +305,86 @@ namespace MyFirstProgram
 
             //Make a calculator program
 
-           do{
-            Console.WriteLine("Enter your first number:a");
-            int a = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("Enter your second number:b");
-            int b = Convert.ToInt32(Console.ReadLine());
+            //do{
+            // Console.WriteLine("Enter your first number:a");
+            // int a = Convert.ToInt32(Console.ReadLine());
+            // Console.WriteLine("Enter your second number:b");
+            // int b = Convert.ToInt32(Console.ReadLine());
 
-            Console.WriteLine("Enter the operation you want to perform (+, -, *, /)");
-            char Operator = Convert.ToChar(Console.ReadKey().KeyChar);
+            // Console.WriteLine("Enter the operation you want to perform (+, -, *, /)");
+            // char Operator = Convert.ToChar(Console.ReadKey().KeyChar);
 
-                string Result = Operator switch
-                {
-                    '+' => (a + b).ToString(),
-                    '-' => (a - b).ToString(),
-                    '*' => (a * b).ToString(),
-                    '/' => (a / b).ToString(),
-                    _ => "Invalid operation"
-                };
-                Console.WriteLine();
-                Console.WriteLine("Result: " + Result);
-                Console.WriteLine("Do you want to perform another operation? (y/n)");
-                
-            }while (Console.ReadLine().ToLower() == "y") ;
-            
+            //     string Result = Operator switch
+            //     {
+            //         '+' => (a + b).ToString(),
+            //         '-' => (a - b).ToString(),
+            //         '*' => (a * b).ToString(),
+            //         '/' => (a / b).ToString(),
+            //         _ => "Invalid operation"
+            //     };
+            //     Console.WriteLine();
+            //     Console.WriteLine("Result: " + Result);
+            //     Console.WriteLine("Do you want to perform another operation? (y/n)");
 
-           
+            // }while (Console.ReadLine().ToLower() == "y") ;
 
 
+            //arrays
+
+            //String[] cars = { "Volvo", "BMW", "Ford", "Mazda" };
+            //for(int i=0;i<cars.Length;i++)
+            //{
+            //    Console.WriteLine(cars[i]);
+            //}
+            //Console.WriteLine(cars);
 
 
+            //String[] cars = new string[3];
+            //cars[0] = "Volvo";
+            //   Console.WriteLine(cars[0]);
 
+            //foreach(string car in cars)
+            //{
+            //    Console.WriteLine(car);
+            //}
+
+            //Console.ReadKey();
+
+            //methods and functions overloading in c#
+
+            //double a, b, c;
+            //a=5; b=5; c=5;
+            //double result1 = Multiply(a, b);
+            //double result2 = Multiply(a, b,c);
+            //Console.WriteLine($"{result1}, {result2}");
+
+            //double total =Checkout(10.5, 20.75, 15.25);
+            //Console.WriteLine(total);
+
+            //double total2 = Checkout(5.99, 12.49);
+            //Console.WriteLine(total2);
+            //Console.ReadKey();
         }
+        //static double Multiply(double a, double b)
+        //{
+        //    return a * b;
+        //}
+
+        //static double Multiply(double a, double b, double c)
+        //{
+        //    return a * b * c;
+        //}
+        //using params keyword to accept variable number of arguments
+        //static double Checkout(params double[] prices)
+        //{
+        //    double total = 0;
+        //    foreach (double price in prices)
+        //    {
+        //        total += price;
+
+        //    }
+        //    return total;
+        //}
     }
+
 }
