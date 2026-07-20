@@ -156,71 +156,97 @@ namespace OOP
 /* Inheritance and Polymorphism Example */
 
 
+//using System;
+
+//namespace OOP
+//{
+//    class Program
+//    {
+//        static void Main(string[] args)
+//        {
+//            Console.ForegroundColor= ConsoleColor.Green;
+//            Shape[] shapes =
+//            {
+//                new Rectangle(5, 10),
+//                new Circle(7)
+//            };
+//            foreach (Shape shape in shapes) {
+
+//                shape.Area();
+
+//            }
+//        }
+//    }
+
+
+//    class Shape
+//    {
+//        public int x;
+//        public int y;
+
+//        public Shape(int x,int y)
+//        {
+//            this.x = x;
+//            this.y = y;
+//        }
+
+//        public virtual void Area()
+//        {
+//            Console.WriteLine("Area of the shape is :");
+//        }
+//    }
+
+//    class Rectangle :Shape
+//    {
+//        public Rectangle(int x, int y) : base(x, y)
+//        {
+//        }
+
+//        public override void Area()
+//        {
+//            int area = x * y;
+//            Console.WriteLine($"Area of the rectangle is: {area}");
+//        }
+//    }
+
+//    class Circle : Shape
+//    {
+//        public int radius;
+//        public Circle(int radius) :base(0,0)
+//        {
+//            this.radius = radius;
+//        }
+
+//        public override void Area()
+//        {
+//            int area = (int)(Math.PI * radius * radius);
+//            Console.WriteLine($"Area of the circle is: {area}");
+//        }
+//    }
+//}
+
+// Abstraction and encapsulation example
+
+using Encapsulation;
 using System;
 
 namespace OOP
 {
-    class Program
+   class Program
     {
         static void Main(string[] args)
         {
-            Console.ForegroundColor= ConsoleColor.Green;
-            Shape[] shapes =
-            {
-                new Rectangle(5, 10),
-                new Circle(7)
-            };
-            foreach (Shape shape in shapes) {
+           BankAccount account = new BankAccount(1000);
+            Console.WriteLine($"Initial Balance: {account.Balance}");
+            account.Deposit(500);
+            Console.WriteLine($"Balance after deposit: {account.Balance}");
+            account.Withdraw(300);
+            Console.WriteLine($"Balance after withdrawal: {account.Balance}");
 
-                shape.Area();
-               
-            }
+            
+
         }
     }
-
-
-    class Shape
-    {
-        public int x;
-        public int y;
-
-        public Shape(int x,int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-
-        public virtual void Area()
-        {
-            Console.WriteLine("Area of the shape is :");
-        }
-    }
-
-    class Rectangle :Shape
-    {
-        public Rectangle(int x, int y) : base(x, y)
-        {
-        }
-
-        public override void Area()
-        {
-            int area = x * y;
-            Console.WriteLine($"Area of the rectangle is: {area}");
-        }
-    }
-
-    class Circle : Shape
-    {
-        public int radius;
-        public Circle(int radius) :base(0,0)
-        {
-            this.radius = radius;
-        }
-       
-        public override void Area()
-        {
-            int area = (int)(Math.PI * radius * radius);
-            Console.WriteLine($"Area of the circle is: {area}");
-        }
-    }
+   
 }
+
