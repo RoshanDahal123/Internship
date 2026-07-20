@@ -227,7 +227,22 @@ namespace OOP
 
 // Abstraction and encapsulation example
 
-using Encapsulation;
+
+// here the Deposit and Withdraw methods are encapsulated within the BankAccount class,
+// and the Balance property is read-only from outside the class.
+// This ensures that the balance can only be modified through the defined methods, maintaining data integrity
+// 
+// the balance field is private, and the Balance property provides controlled access to it.
+// The Deposit and Withdraw methods encapsulate the logic for modifying the balance, ensuring that it cannot be set to an invalid state from outside the class.
+
+//Abstraction is the concept of hiding the complex
+//implementation details and showing only the essential
+//features of an object. In this example, the BankAccount class abstracts
+//the details of how deposits and withdrawals are handled,
+//allowing users to interact with a simple interface without needing to understand the underlying logic.
+//using Encapsulation;
+
+using abastractClasses;
 using System;
 
 namespace OOP
@@ -236,15 +251,16 @@ namespace OOP
     {
         static void Main(string[] args)
         {
-           BankAccount account = new BankAccount(1000);
-            Console.WriteLine($"Initial Balance: {account.Balance}");
-            account.Deposit(500);
-            Console.WriteLine($"Balance after deposit: {account.Balance}");
-            account.Withdraw(300);
-            Console.WriteLine($"Balance after withdrawal: {account.Balance}");
+            //BankAccount account = new BankAccount(1000);
+            // Console.WriteLine($"Initial Balance: {account.Balance}");
+            // account.Deposit(500);
+            // Console.WriteLine($"Balance after deposit: {account.Balance}");
+            // account.Withdraw(300);
+            // Console.WriteLine($"Balance after withdrawal: {account.Balance}");
 
-            
-
+            Notification email = new EmailNotification();
+            email.Send("Hello, this is a test email notification.");
+            email.LogDeleivery("Hello, this is a test email notification.");
         }
     }
    
