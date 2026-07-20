@@ -242,7 +242,8 @@ namespace OOP
 //allowing users to interact with a simple interface without needing to understand the underlying logic.
 //using Encapsulation;
 
-using abastractClasses;
+//using abastractClasses;
+using interfaces;
 using System;
 
 namespace OOP
@@ -258,9 +259,24 @@ namespace OOP
             // account.Withdraw(300);
             // Console.WriteLine($"Balance after withdrawal: {account.Balance}");
 
-            Notification email = new EmailNotification();
-            email.Send("Hello, this is a test email notification.");
-            email.LogDeleivery("Hello, this is a test email notification.");
+
+            //abstract classes example
+            //Notification email = new EmailNotification();
+            //email.Send("Hello, this is a test email notification.");
+            //email.LogDeleivery("Hello, this is a test email notification.");
+
+
+            Console.WriteLine("Press any key to exit...");
+
+            Duck a = new Duck("Donald");
+            a.MakeSound();
+            a.Swim();
+            a.Fly();
+
+            Cat b = new Cat("Tom");
+            b.MakeSound();
+            b.Swim();
+            b.Fly();
         }
     }
    
