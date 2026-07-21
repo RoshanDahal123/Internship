@@ -36,20 +36,20 @@ namespace C_Sharp_Advanced_Concepts
                     case 3:
                         DelegatesEventsDemo.Run();
                         break;
-                    //case 4:
-                    //    await AsyncDemo.Run();
-                    //    break;
+                    case 4:
+                        await AsyncDemo.Run();
+                        break;
                     //case 5:
                     //    FileHandlingDemo.Run();
                     //    break;
-                    //case 6:
-                    //    CollectionsDemo.Run();
-                    //    GenericsLinqDemo.Run();
-                    //    DelegatesEventsDemo.Run();
-                    //    await AsyncDemo.Run();
-                    //    FileHandlingDemo.Run();
-                    //    Console.WriteLine("All demos finished.\n");
-                    //    break;
+                    case 6:
+                        Collection.Run();
+                        GenericsLinqDemo.Run();
+                        DelegatesEventsDemo.Run();
+                        await AsyncDemo.Run();
+                        //FileHandlingDemo.Run();
+                        //Console.WriteLine("All demos finished.\n");
+                        break;
                     case 0:
                         keepRunning = false;
                         Console.WriteLine("Goodbye!");
