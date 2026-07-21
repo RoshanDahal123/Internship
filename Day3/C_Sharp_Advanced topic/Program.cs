@@ -29,9 +29,9 @@ namespace C_Sharp_Advanced_Concepts
                     case 1:
                         Collection.Run();
                         break;
-                    //case 2:
-                    //    GenericsLinqDemo.Run();
-                    //    break;
+                    case 2:
+                        GenericsLinqDemo.Run();
+                        break;
                     //case 3:
                     //    DelegatesEventsDemo.Run();
                     //    break;
