@@ -39,9 +39,9 @@ namespace C_Sharp_Advanced_Concepts
                     case 4:
                         await AsyncDemo.Run();
                         break;
-                    //case 5:
-                    //    FileHandlingDemo.Run();
-                    //    break;
+                    case 5:
+                        FileHandlingDemo.Run();
+                        break;
                     case 6:
                         Collection.Run();
                         GenericsLinqDemo.Run();
