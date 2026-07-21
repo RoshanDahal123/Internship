@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 
 using System.Threading.Tasks;
 
@@ -32,9 +33,9 @@ namespace C_Sharp_Advanced_Concepts
                     case 2:
                         GenericsLinqDemo.Run();
                         break;
-                    //case 3:
-                    //    DelegatesEventsDemo.Run();
-                    //    break;
+                    case 3:
+                        DelegatesEventsDemo.Run();
+                        break;
                     //case 4:
                     //    await AsyncDemo.Run();
                     //    break;
