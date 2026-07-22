@@ -73,12 +73,12 @@ namespace C_Sharp_Advanced_Concepts
             Console.WriteLine($" Exists:{info.Exists},Size:{info.Length} bytes, Last write:{info.LastWriteTime}");
             // ---- Cleanup ----
 
-            //File.Delete(filePath);
-            //Directory.Delete(folder);
-          
-            //Console.WriteLine("\n  Cleaned up demo file and folder.");
+            File.Delete(filePath);
+            Directory.Delete(folder);
 
-            //Console.WriteLine();
+            Console.WriteLine("\n  Cleaned up demo file and folder.");
+
+            Console.WriteLine();
 
         }
     }
