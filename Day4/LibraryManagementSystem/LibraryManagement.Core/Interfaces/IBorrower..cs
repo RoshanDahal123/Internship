@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LibraryManagementSystem.LibraryManagement.Core.Interfaces
+namespace LibraryManagement.Core.Interfaces;
+
+//Interface= a contract. Any thing that can borrow books can implements this,
+
+//regardless of what kind of Person it is
+
+public interface IBorrower
 {
-    internal interface IBorrower
-    {
-    }
+    int MaxBooksAllowed { get; }
+    List<int> BorrowedBooksIds { get; }
 }
