@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryManagement.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,11 +12,11 @@ public class Book
 
     public string Author { get; set; }
     public string Isbn { get; set; }
-
+    public BooksStatus Status { get; set; } = BooksStatus.Available;
     public Book(int id, string title, string author , string isbn)
     {
     Id=id;
-        Title = title;
+    Title = title;
     Author= author;
     Isbn=isbn;
     }

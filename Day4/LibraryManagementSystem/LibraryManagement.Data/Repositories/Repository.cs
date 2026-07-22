@@ -1,6 +1,5 @@
 ﻿using LibraryManagement.Core.Interfaces;
 using LibraryManagement.Core.Models;
-using LibraryManagementSystem.LibraryManagement.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -72,7 +71,7 @@ public class Repository<T> : IRepository<T> where T : class
         }
         finally
         {
-            Console.WriteLine($"Load attempt finished for {typeof(T).Name}")
+            Console.WriteLine($"Load attempt finished for {typeof(T).Name}");
         }
 
     }

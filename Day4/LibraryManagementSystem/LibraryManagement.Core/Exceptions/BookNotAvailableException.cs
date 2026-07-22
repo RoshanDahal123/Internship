@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LibraryManagementSystem.LibraryManagement.Core.Exceptions
+namespace LibraryManagement.Core.Exceptions;
+
+// Custom exceptions make error handling upstream much clearer than generic Exception.
+
+public class BookNotAvailableException: Exception
 {
-    internal class BookNotAvailableException
-    {
-    }
+    public BookNotAvailableException(string bookTitle) : base($"`{bookTitle}' is not " +
+        $"available for borrowing right now.")
+    { }
+
 }
+

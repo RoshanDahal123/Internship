@@ -9,18 +9,18 @@ public class Loan
     public int BookId { get; }
     public int BorrowerId { get; }
     public DateTime BorrowedOn { get; }
-    public DateTime? DueDate { get; }
+    public DateTime DueDate { get; }
 
     public DateTime? ReturnedOn { get; set; }
 
-    public bool isOverDue => ReturnedOn is null && DateTime.Now > DueDate;
+    public bool IsOverDue => ReturnedOn is null && DateTime.Now > DueDate;
 
-    public Loan(int bookId, int borrowerId, DateTime borrowedOn, DateTime? dueDate, DateTime? returnedOn)
+    public Loan(int bookId, int borrowerId, DateTime borrowedOn,int loanDays=14)
     {
         BookId = bookId;
         BorrowerId = borrowerId;
         BorrowedOn = borrowedOn;
-        DueDate = dueDate;
-        ReturnedOn = returnedOn;
+        DueDate = borrowedOn.AddDays(loanDays);
+       
     }
 }
