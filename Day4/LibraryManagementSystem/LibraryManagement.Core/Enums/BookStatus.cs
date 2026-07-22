@@ -1,10 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace LibraryManagement.Core.Enums;
 
-namespace LibraryManagementSystem.LibraryManagement.Core.Enums
-{
-    internal class BookStatus
-    {
-    }
-}
+public enum Books { Available,Borrowed,Reserved,Lost}
