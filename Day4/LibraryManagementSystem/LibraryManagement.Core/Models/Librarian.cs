@@ -2,9 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LibraryManagementSystem.LibraryManagement.Core.Models
+namespace LibraryManagement.Core.Models;
+
+public class Librarian: Person
 {
-    internal class Librarian
+    public string StaffCode { get; }
+    public Librarian(int id, string name, string email, string staffCode):base(
+        id, name, email)
     {
+        StaffCode = staffCode;
     }
+    public override string GetRole() => "Librarian";
+    
 }
