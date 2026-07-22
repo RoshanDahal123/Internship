@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LibraryManagementSystem.LibraryManagement.Core.Exceptions
+namespace LibraryManagement.Core.Exceptions;
+
+public class MemberNotFoundException : Exception
 {
-    internal class MemberNotFoundException
-    {
-    }
+    public MemberNotFoundException(int id) : base($"No member found with id:{id}")
+    { }
+
 }
