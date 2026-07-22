@@ -1,3 +1,3 @@
 ﻿namespace LibraryManagement.Core.Enums;
 
-public enum Books { Available,Borrowed,Reserved,Lost}
+public enum BooksStatus { Available,Borrowed,Reserved,Lost}
