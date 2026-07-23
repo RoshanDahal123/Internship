@@ -10,16 +10,18 @@ public class LibraryService
 {
     private readonly Repository<Book> _books;
     private readonly Repository<Loan> _loans;
+    
     // Delegate + event: LibraryService announces things happened,
     // it doesn't care who's listening (could be a console logger, an email service, both).
 
     public event Action<Book>? BookBorrowed;
     public event Action<Book>? BookReturned;
 
-    public LibraryService(Repository<Book> books, Repository<Loan> loans)
+    public LibraryService(Repository<Book> books, Repository<Loan> loans )
     {
         _books = books;
         _loans = loans;
+    
     }
 
     public void BorrowBook(int bookId, IBorrower borrower, int borrowerId)
@@ -36,7 +38,7 @@ public class LibraryService
             throw new InvalidOperationException("Borrowing limit reached");
         book.Status = BooksStatus.Borrowed;
         borrower.BorrowedBooksIds.Add(bookId);
-        _loans.Add(new Loan(bookId, borrowerId, DateTime.Now));
+        _loans.Add(Loan.Create(_loans.GetNextId(), bookId, borrowerId, DateTime.Now));
         BookBorrowed?.Invoke(book);//raise the event
 
     }
@@ -62,10 +64,7 @@ public class LibraryService
         .Where(b => b.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase))
         .OrderBy(b => b.Title);
 
-    public Dictionary<BooksStatus, int> GetInventorySummary() =>
-        _books.GetAll()
-            .GroupBy(b => b.Status)
-            .ToDictionary(g => g.Key, g => g.Count());
+    
 
 }
 

@@ -1,5 +1,6 @@
 ﻿using LibraryManagement.Core.Interfaces;
 using LibraryManagement.Core.Models;
+using LibraryManagement.Data.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,14 +15,14 @@ public class Repository<T> : IRepository<T> where T : class
 {
     private readonly List<T> _items = new();//collections
     private readonly Func<T, int> _idSelector;  //Delegate stored as a field
-    private readonly string _filepath;
+    private readonly JsonFileStore<T> _store;
 
-    public Repository(Func<T, int> idSelector, string filepath)
+    public Repository(Func<T, int> idSelector, JsonFileStore<T> store)
     {
         _idSelector = idSelector;
-        _filepath = filepath;
+        _store = store;
 
-     }
+    }
 
 
     public void Add(T item) => _items.Add(item);
@@ -36,43 +37,28 @@ public class Repository<T> : IRepository<T> where T : class
 
     public IEnumerable<T> GetAll() => _items;
 
-    // Async file handling: reading/ writing shouldnm't bplck the console thresd.
-    
-    public async Task SaveToFileAsync()
+    public int GetNextId() => _items.Any() ? _items.Max(_idSelector) + 1 : 1;
+    public void Update(T item)
     {
-        try
+        var id = _idSelector(item);
+        var index = _items.FindIndex(x => _idSelector(x) == id);
+        if (index == -1)
         {
-            var json = JsonSerializer.Serialize(_items, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(_filepath, json);
+            throw new InvalidOperationException($"{typeof(T).Name}with id{id} not found");
         }
-        catch(IOException ex)
-        {
-            Console.WriteLine($"Failed to save {typeof(T).Name} data:{ex.Message}");
-        }
+        _items[index] = item;
+
     }
+
+    public Task SaveToFileAsync() => _store.SaveAsync(_items);
+
 
     public async Task LoadFromFileAsync()
     {
-        if (!File.Exists(_filepath)) return;
-
-        try
-        {
-            await using var stream = File.OpenRead(_filepath);
-            var loaded = await JsonSerializer.DeserializeAsync<List<T>>(stream);
-            if(loaded is not null)
-            {
-                _items.Clear();
-                _items.AddRange(loaded);
-            }
-        }
-        catch(JsonException ex)
-        {
-            Console.WriteLine($"Corrupt data file for {typeof(T).Name}: {ex.Message} ");
-        }
-        finally
-        {
-            Console.WriteLine($"Load attempt finished for {typeof(T).Name}");
-        }
-
+        var loaded = await _store.LoadAsync();
+        _items.Clear();
+        _items.AddRange(loaded);
     }
+
+
 }

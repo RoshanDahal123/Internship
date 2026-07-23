@@ -28,6 +28,10 @@ public abstract class Person
     public abstract string GetRole();
     public override string ToString() => $"[{Id}] {Name} ({GetRole()})";
 
-
+    public void UpdateContactInfo(string name, string email)
+    {
+        Name = name;
+        Email = email;
+    }
 
 }
