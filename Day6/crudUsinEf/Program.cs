@@ -30,7 +30,8 @@ class Program
             Console.WriteLine("4. View Employee by Id");
             Console.WriteLine("5. Update Employee");
             Console.WriteLine("6. Delete Employee");
-            Console.WriteLine("7. Exit");
+            Console.WriteLine("7. Sorted Employees");
+            Console.WriteLine("8. Exit");
             Console.Write("Choose an option: ");
 
             string? choice = Console.ReadLine();
@@ -56,6 +57,9 @@ class Program
                     await DeleteEmployee(repo);
                     break;
                 case "7":
+                    await ViewAllEmployeesSorted(repo);
+                    break;
+                case "8":
                     running = false;
                     Console.WriteLine("Goodbye!");
                     break;
@@ -95,6 +99,18 @@ class Program
                 return;
             }
 
+            foreach (var emp in employees)
+                Console.WriteLine(emp);
+        }
+        async Task ViewAllEmployeesSorted(EmployeeRepository repo)
+        {
+            var employees = await repo.GetAllEmployeesSortedAsync();
+
+            if (employees.Count == 0)
+            {
+                Console.WriteLine("No employees found");
+                return;
+            }
             foreach (var emp in employees)
                 Console.WriteLine(emp);
         }

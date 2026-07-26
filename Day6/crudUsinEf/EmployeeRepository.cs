@@ -65,6 +65,19 @@ public class EmployeeRepository
             return new List<Employee>();
         }
     }
+    public async Task<List<Employee>> GetAllEmployeesSortedAsync()
+    {
+        try
+        {
+            return await _context.Employees.OrderByDescending(e => e.Salary).ToListAsync();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception occurred: {ex.Message}");
+            return new List<Employee>();
+        }
+    }
 
 
     //read ny id
