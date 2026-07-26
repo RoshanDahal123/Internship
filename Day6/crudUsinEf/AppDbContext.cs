@@ -1,10 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+using Microsoft.EntityFrameworkCore;
 
-namespace crudUsinEf
+namespace MySqlCrudApp;
+
+public class AppDbContext : DbContext
 {
-    internal class AppDbContext
+    private readonly string _connectionString;
+    public AppDbContext(string connectionString)
     {
+        _connectionString= connectionString;
     }
+
+    public DbSet<Employee> Employees { get; set; } = null!;//null forgiving operator
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer(_connectionString);
+    }
+
 }

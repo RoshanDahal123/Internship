@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace MySqlCrudApp;
 
-namespace crudUsinEf
+public class Employee
 {
-    internal class Employee
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Department { get; set; }
+    public decimal Salary { get; set; }
+
+    public override string ToString()
     {
+        return $"[{Id}] {Name,-15} {Department,-12} {Salary:C}";
     }
 }
