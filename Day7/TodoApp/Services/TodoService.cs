@@ -8,14 +8,17 @@ namespace TodoApp.Services;
 public class TodoService: ITodoService
 {
     private readonly AppDbContext _context;
-    
-    public TodoService(AppDbContext context)
+    private readonly ILogger<TodoService> _logger;
+
+    public TodoService(AppDbContext context, ILogger<TodoService> logger)
     {
         _context = context;
-    }
+        _logger = logger;
+    
 
 
     public async Task<IEnumerable<TodoItem>> GetAllAsync()
+        _logger.LogInformation("Fetching all todos at {Time}", DateTime.Now);
     {
         try
         {
@@ -23,35 +26,40 @@ public class TodoService: ITodoService
                 .OrderByDescending(t => t.Priority)
                 .ThenBy(t => t.CreatedAt)
                 .ToListAsync();
-
+          _logger.LogInformation("Retrieved {Count} todos", todos.Count);
             return todos;
         }
         catch (Exception ex)
         {
-            //_logger.LogError(ex, "Error fetching todos");
+            _logger.LogError(ex, "Error fetching todos");
             throw;
         }
     }
 
     public async Task<TodoItem?> GetByIdAsync(int id)
     {
-        await _context.Todos.FindAsync(id);
+    _logger.LogDebug("Getting todo with ID {Id}", id);
+    await _context.Todos.FindAsync(id);
     }
 
     public async Task<TodoItem> CreateAsync(TodoItem todo)
     {
-        _context.Todos.Add(todo);
-        await _context.SaveChangesAsync();
 
-        return todo;
+    _logger.LogInformation("Creating new todo: {@Todo}", todo);
+    _context.Todos.Add(todo);
+        await _context.SaveChangesAsync()
+       _logger.LogInformation("Todo created with ID {Id}", todo.Id);
+    return todo;
     }
 
     public async Task<TodoItem?> UpdateAsync(int id , TodoItem todo)
     {
-        var existing = await GetByIdAsync(id);
+    _logger.LogInformation("Updating todo with ID {Id}", id);
+    var existing = await GetByIdAsync(id);
         if(existing == null)
         {
-            return null;
+        _logger.LogWarning("Todo with ID {Id} not found for update", id);
+        return null;
         }
 
         existing.Title = todo.Title;
@@ -62,8 +70,8 @@ public class TodoService: ITodoService
         if(todo.IsCompleted && !existing.IsCompleted)
         {
             existing.CompletedAt = DateTime.Now;
-
-        }
+        _logger.LogInformation("Todo {Id} marked as completed at {CompletedAt}", id, existing.CompletedAt);
+    }
         await _context.SaveChangesAsync();
 
         return existing;
