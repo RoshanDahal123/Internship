@@ -59,11 +59,11 @@ public class Program
         var app = builder.Build();
 
 
-        if (app.Environment.IsDevelopment())
+        app.UseSwaggerUI(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo API v1"));
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo API v1");
+            c.InjectStylesheet("/swagger-custom.css");
+        })
 
         app.UseSerilogRequestLogging(); // log HTTP requests
         app.UseHttpsRedirection();
