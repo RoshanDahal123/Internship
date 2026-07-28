@@ -1,31 +1,51 @@
-html {
-  font-size: 14px;
+.todo-enter {
+    animation: slideIn 0.3s ease-out;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.list-group-item {
+    transition: all 0.2s ease;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
 }
 
-body {
-  margin-bottom: 60px;
+.card .card-text {
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.card:hover .card-text {
+    transform: scale(1.1);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+@media (max-width: 768px) {
+    .list-group-item {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+
+        .list-group-item > .d-flex {
+            width: 100%;
+            justify-content: space-between;
+        }
 }

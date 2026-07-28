@@ -1,5 +1,32 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model TodoItem
 @{
+    ViewData["Title"] = "Delete Task";
 }
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-trash me-2"></i>Delete Task</h5>
+            </div>
+            <div class="card-body">
+                <p class="lead">Are you sure you want to delete <strong>@Model.Title</strong>?</p>
+                <dl class="row">
+                    <dt class="col-sm-3">Description</dt>
+                    <dd class="col-sm-9">@Model.Description</dd>
+                    <dt class="col-sm-3">Priority</dt>
+                    <dd class="col-sm-9">@(Model.Priority == 3 ? "High" : Model.Priority == 2 ? "Medium" : "Low")</dd>
+                    <dt class="col-sm-3">Status</dt>
+                    <dd class="col-sm-9">@(Model.IsCompleted ? "Completed" : "Pending")</dd>
+                </dl>
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i>Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

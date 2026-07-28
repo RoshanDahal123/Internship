@@ -70,7 +70,7 @@ public class TodoService: ITodoService
         if(todo.IsCompleted && !wasCompleted)
         {
             existing.CompletedAt = DateTime.Now;
-        _logger.LogInformation("Todo {Id} marked as completed at {CompletedAt}", id, existing.CompletedAt);
+        _logger.LogInformation("Todo {Id} marked as completed at {CompletedAt}", id,existing.IsCompleted);
     }
         await _context.SaveChangesAsync();
 
@@ -81,26 +81,27 @@ public class TodoService: ITodoService
 
     public async Task<bool> DeleteAsync(int id)
     {
-        //_logger.LogInformation("Deleting todo with ID {Id}", id);
+        _logger.LogInformation("Deleting todo with ID {Id}", id);
         var todo = await GetByIdAsync(id);
         if (todo == null)
         {
-            //_logger.LogWarning("Todo with ID {Id} not found for deletion", id);
+            _logger.LogWarning("Todo with ID {Id} not found for deletion", id);
             return false;
         }
 
         _context.Todos.Remove(todo);
         await _context.SaveChangesAsync();
-        //_logger.LogInformation("Todo {Id} deleted", id);
+        _logger.LogInformation("Todo {Id} deleted", id);
         return true;
     }
 
 
     public async Task<TodoItem?> ToggleCompleteAsync(int id){
-
+        _logger.LogInformation("Toggling the completed of Todo{id}", id);
         var todo = await GetByIdAsync(id);
         if (todo == null)
         {
+            _logger.LogWarning("Todo with ID {Id} not found for update Todo completed", id);
             return null;
         }
 
@@ -108,7 +109,7 @@ public class TodoService: ITodoService
         todo.CompletedAt = todo.IsCompleted ? DateTime.Now : (DateTime?)null;
 
          await _context.SaveChangesAsync();
-
+        _logger.LogInformation("Toggleof  {Id} updated ", id);
         return todo;
 
     }

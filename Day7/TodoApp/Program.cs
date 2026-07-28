@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using TodoApp.Data;
 using TodoApp.Services;
-using Microsoft.OpenApi; 
+using Microsoft.OpenApi;
+using TodoApp.Middlewares;
 public class Program
 {
     private static void Main(string[] args)
@@ -81,6 +82,7 @@ public class Program
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
         app.MapControllers();
+        app.UseMiddleware<ExceptionMiddleware>();
 
         // Instead of EnsureCreated(), we will use migrations.
         // But for development, you can still use EnsureCreated() if you prefer,

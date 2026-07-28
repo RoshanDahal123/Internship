@@ -1,8 +1,105 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model TodoViewModel
+@{
+    ViewData["Title"] = "My Todos";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-info">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Tasks</h5>
+                        <h2 class="card-text">@Model.TotalCount</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Completed</h5>
+                        <h2 class="card-text">@Model.CompletedCount</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-warning">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Progress</h5>
+                        <h2 class="card-text">@Model.CompletionRate.ToString("F0")%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Todo List -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Your Tasks</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Todos.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var todo in Model.Todos)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center @(todo.IsCompleted ? "bg-light" : "")">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <button class="btn btn-sm @(todo.IsCompleted ? "btn-success" : "btn-outline-secondary") me-3 toggle-complete" data-id="@todo.Id" title="Toggle completion">
+                                        <i class="fas @(todo.IsCompleted ? "fa-check-circle" : "fa-circle")"></i>
+                                    </button>
+                                    <div>
+                                        <h6 class="mb-0 @(todo.IsCompleted ? "text-decoration-line-through text-muted" : "")">
+                                            @todo.Title
+                                        </h6>
+                                        @if (!string.IsNullOrEmpty(todo.Description))
+                                        {
+                                            <small class="text-muted">@todo.Description</small>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge @(todo.Priority == 3 ? "bg-danger" : todo.Priority == 2 ? "bg-warning" : "bg-info") me-2">
+                                        @(todo.Priority == 3 ? "High" : todo.Priority == 2 ? "Medium" : "Low")
+                                    </span>
+                                    <a asp-action="Edit" asp-route-id="@todo.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@todo.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                        <h5>No tasks yet</h5>
+                        <p class="text-muted">Create your first task!</p>
+                        <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Create Task</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.toggle-complete').click(function() {
+                var button = $(this);
+                var id = button.data('id');
+                $.ajax({
+                    url: '@Url.Action("ToggleComplete", "Home")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(data) {
+                        if (data.success) location.reload();
+                    },
+                    error: function() { alert('Error toggling task completion'); }
+                });
+            });
+        });
+    </script>
+}
