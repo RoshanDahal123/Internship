@@ -61,13 +61,13 @@ public class TodoService: ITodoService
         _logger.LogWarning("Todo with ID {Id} not found for update", id);
         return null;
         }
-
+        bool wasCompleted = existing.IsCompleted;
         existing.Title = todo.Title;
         existing.Description = todo.Description;
         existing.Priority = todo.Priority;
         existing.IsCompleted = todo.IsCompleted;
 
-        if(todo.IsCompleted && !existing.IsCompleted)
+        if(todo.IsCompleted && !wasCompleted)
         {
             existing.CompletedAt = DateTime.Now;
         _logger.LogInformation("Todo {Id} marked as completed at {CompletedAt}", id, existing.CompletedAt);
