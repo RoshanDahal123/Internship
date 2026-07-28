@@ -1,4 +1,4 @@
-﻿using Microsofy.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TodoApp.Data;
 using TodoApp.Models;
 
@@ -14,12 +14,12 @@ public class TodoService: ITodoService
     {
         _context = context;
         _logger = logger;
-    
+    }
 
 
     public async Task<IEnumerable<TodoItem>> GetAllAsync()
-        _logger.LogInformation("Fetching all todos at {Time}", DateTime.Now);
     {
+        _logger.LogInformation("Fetching all todos at {Time}", DateTime.Now);
         try
         {
             var todos = await _context.Todos
@@ -39,7 +39,7 @@ public class TodoService: ITodoService
     public async Task<TodoItem?> GetByIdAsync(int id)
     {
     _logger.LogDebug("Getting todo with ID {Id}", id);
-    await _context.Todos.FindAsync(id);
+    return await _context.Todos.FindAsync(id);
     }
 
     public async Task<TodoItem> CreateAsync(TodoItem todo)
@@ -47,7 +47,7 @@ public class TodoService: ITodoService
 
     _logger.LogInformation("Creating new todo: {@Todo}", todo);
     _context.Todos.Add(todo);
-        await _context.SaveChangesAsync()
+        await _context.SaveChangesAsync();
        _logger.LogInformation("Todo created with ID {Id}", todo.Id);
     return todo;
     }
@@ -96,7 +96,7 @@ public class TodoService: ITodoService
     }
 
 
-    public async asybc Task<TodoItem?> ToggleCompleteAsync(int id){
+    public async Task<TodoItem?> ToggleCompleteAsync(int id){
 
         var todo = await GetByIdAsync(id);
         if (todo == null)

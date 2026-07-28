@@ -61,7 +61,7 @@ public class TodoController : ControllerBase
         if (id != todo.Id)
             return BadRequest(new { message = "Id mismatch" });
 
-        var updated = await _todoService.UpdateAsync(todo);
+        var updated = await _todoService.UpdateAsync(id,todo);
         if(updated==null)
             return NotFound(new { message = $"Todo with ID {id} not found" });
 
@@ -71,9 +71,8 @@ public class TodoController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-
-    public async Task<IActionResult>
-        {
+    public async Task<IActionResult> Delete(int id)
+    {
         var deleted = await _todoService.DeleteAsync(id);
         if (!deleted)
             return NotFound(new { message = $"Todo with ID {id} not found" });

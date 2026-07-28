@@ -13,7 +13,7 @@ public class TodoItem
     public string Description { get; set; } = string.Empty;
     public bool IsCompleted { get; set; } = false;
     public DateTime CreatedAt { get; set; }= DateTime.Now;
-    public DateTime? CompletedAt { get; set; };
+    public DateTime? CompletedAt { get; set; }
     public int Priority { get; set; } = 1; // 1=Low, 2=Medium, 3=High
 
 

@@ -24,5 +24,10 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
+	<ItemGroup>
+		<None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+		<!-- Include environment-specific settings if you have them -->
+		<None Include="appsettings.Development.json" CopyToOutputDirectory="PreserveNewest" DependsOn="appsettings.json" />
+	</ItemGroup>
 
 </Project>
