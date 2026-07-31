@@ -1,7 +1,7 @@
 using Scalar.AspNetCore;
 using VideoGameCharacterApi.Services;
-
-
+using VideoGameCharacterApi.Data;
+using Microsoft.EntityFrameworkCore;
 public partial class Program
 {
     private static void Main(string[] args)
@@ -17,6 +17,10 @@ public partial class Program
 
         //Dependency injection
         builder.Services.AddScoped<IVideoGameCharacterService, VideoGameCharacterService>();
+        builder.Services.AddDbContext<AppDbContext>(
+            options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
+            
         var app = builder.Build();
         
         // Configure the HTTP request pipeline.
