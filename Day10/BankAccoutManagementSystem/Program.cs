@@ -1,10 +1,12 @@
 ﻿using BankAccoutManagementSystem.Exceptions;
 using BankAccoutManagementSystem.Model;
 using BankAccoutManagementSystem.Interfaces;
+using BankAccoutManagementSystem.Services;
+
 
 var savings = new SavingsAccount("Roshan", 1, 1001, 500m, "NIC Asia", 0.05m);
 var current = new CurrentAccount("Sita", 2, 2001, 200m, "NIC Asia", 500m);
-
+var savings2 = new SavingsAccount("Sujit", 3, 3001, 800m, "Machapuchre", 0.05m);
 Console.WriteLine(savings);
 Console.WriteLine(current);
 
@@ -51,5 +53,32 @@ if (savings is IInterestBearing interestBearing)
     decimal earned = interestBearing.ApplyInterest();
     Console.WriteLine($"Interest applied: {earned:C}");
     Console.WriteLine(savings);
-    Console.ReadKey();
 }
+
+
+var bank = new BankService();
+bank.OpenAccount(savings);
+bank.OpenAccount(savings2);
+bank.OpenAccount(current);
+
+Console.WriteLine();
+Console.WriteLine("--- Bank Service ---");
+Console.WriteLine($"Total assets: {bank.GetTotalBankAssets():C}");
+
+Console.WriteLine("Accounts above $300:");
+foreach (var acc in bank.GetAccountsAboveBalance(300m))
+{
+    Console.WriteLine($"  {acc}");
+}
+
+Console.WriteLine("Savings accounts only:");
+foreach (var acc in bank.GetAccountsByType<SavingsAccount>())
+{
+    Console.WriteLine($"  {acc}");
+}
+
+var highest = bank.GetHighestBalanceAccount();
+Console.WriteLine($"Highest balance account: {highest}");
+Console.ReadKey();
+
+
