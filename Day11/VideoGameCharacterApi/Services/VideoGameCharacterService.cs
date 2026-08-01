@@ -1,43 +1,100 @@
-﻿using VideoGameCharacterApi.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Immutable;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Data;
+using VideoGameCharacterApi.Data;
+using VideoGameCharacterApi.Dtos;
+using VideoGameCharacterApi.Models;
+
 namespace VideoGameCharacterApi.Services
 {
-    public class VideoGameCharacterService:IVideoGameCharacterService
+    public class VideoGameCharacterService(AppDbContext context) : IVideoGameCharacterService
     {
-        static List<Character> characters = new List<Character>
-    {
-        new Character { Id= 1, Name = "mario", Game = "Super mario Bros", Role = "Protagonist"},
-        new Character  { Id = 3, Name = "Bowser", Game = "Super Mario Bros", Role = "Antagonist" },
-        new Character { Id = 4, Name = "Princess Peach", Game = "Super Mario Bros", Role = "Supporting" },
-    };
-        public async Task<List<Character>> GetAllCharactersAsync() => await Task.FromResult(characters);
+
+        public async Task<List<CharacterResponse>> GetAllCharactersAsync()
+            => await context.Characters.Select(c => new CharacterResponse
+            {
+                Id= c.Id,
+                Name = c.Name,
+                Game = c.Game,
+                Role = c.Role
+            }).ToListAsync();
 
 
 
-        public async Task<Character?> GetCharacterByIdAsync(int id)
+        public async Task<CharacterResponse?> GetCharacterByIdAsync(int id)
         {
-            var result = characters.FirstOrDefault(c => c.Id == id);
-            return await Task.FromResult(result);
+            var result = await context.Characters
+                .Where(c => c.Id == id)
+                .Select(c => new CharacterResponse
+                {   Id = c.Id,
+                    Name = c.Name,
+                    Game = c.Game,
+                    Role = c.Role
+                })
+                .FirstOrDefaultAsync();
+            return result;
         }
 
-        public async Task<Character> AddCharacterAsync(Character character)
+        public async Task<CharacterResponse> AddCharacterAsync(CreateCharacterRequest character)
         {
-            
-            throw new NotImplementedException ();
+            var newCharacter = new Character
+            {
+                Name = character.Name,
+                Game = character.Game,
+                Role = character.Role
+            };
+
+            context.Characters.Add(newCharacter);
+            await context.SaveChangesAsync();
+
+            return new CharacterResponse
+            {
+                Id = newCharacter.Id,
+                Name = newCharacter.Name,
+                Game = newCharacter.Game,
+                Role = newCharacter.Role
+            };
+
 
         }
 
-        public async Task<bool> UpdateCharacterAsync(int id,Character character)
+        public async Task<bool> UpdateCharacterAsync(int id, UpdateCharacterRequest character)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var existingCharacter = await context.Characters.FindAsync(id);
+                if (existingCharacter is null)
+                {
+                    return false;
+                }
+                existingCharacter.Name = character.Name;
+                existingCharacter.Game = character.Game;
+                existingCharacter.Role = character.Role;
+                await context.SaveChangesAsync();
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"ExceptionOccured{ex.Message}");
+                return false;
+            }
+
+
         }
 
         public async Task<bool> DeleteCharacterAsync(int id)
         {
-            throw new NotImplementedException();
+            var characterToDelete = await context.Characters.FindAsync(id);
+            if(characterToDelete is null)
+            {
+                return false;
+            }
+
+            context.Characters.Remove(characterToDelete);
+            await context.SaveChangesAsync();
+
+            return true;
+
         }
 
 
