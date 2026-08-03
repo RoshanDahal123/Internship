@@ -13,7 +13,9 @@ public partial class Program
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
-
+        builder.Services.AddCors(options =>
+      options.AddPolicy("AllowReactDev", p =>
+     p.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
 
         //Dependency injection
         builder.Services.AddScoped<IVideoGameCharacterService, VideoGameCharacterService>();
@@ -29,6 +31,10 @@ public partial class Program
             app.MapOpenApi();
             app.MapScalarApiReference();
         }
+
+       
+
+        app.UseCors("AllowReactDev");
 
         app.UseHttpsRedirection();
 

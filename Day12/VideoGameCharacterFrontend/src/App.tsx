@@ -1,16 +1,7 @@
 
-
-import './App.css'
-
-function App() {
-  
-
-  return(
-    <>
-    </>
-  )
-  
-  
+import { CharacterPage } from './features/characters/CharacterPage';
+export function App() {
+  return <CharacterPage />;
 }
 
-export default App
+export default App;
