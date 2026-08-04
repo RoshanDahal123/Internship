@@ -3,7 +3,7 @@ import { Button } from "../../components/Button/Button";
 import { Modal } from "../../components/Modal/Modal";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { useCharacters } from "../../hooks/useCharacters";
-import type { Character } from "../../types/character.types";
+import type { Character, UpdateCharacterRequest } from "../../types/character.types";
 import { CharacterForm } from "../components/CharacterForm";
 import { CharacterList } from "../components/CharacterList";
 import styles from './CharacterPage.module.css';
@@ -55,7 +55,8 @@ type ModalState =
           <CharacterForm
             initialValue={modal.character}
             onSubmit={async (data) => {
-              await updateCharacter(modal.character.id,data);
+           
+              await updateCharacter(modal.character.id,data as UpdateCharacterRequest);
               closeModal();
             }}
             onCancel={closeModal}
