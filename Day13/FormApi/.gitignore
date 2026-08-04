@@ -1,0 +1,120 @@
+##################################
+# Environment / secrets
+##################################
+.env
+.env.local
+.env.*.local
+**/appsettings.Development.json
+**/appsettings.*.local.json
+*.pfx
+*.pem
+secrets.json
+
+##################################
+# Frontend (Vite / React / TS)
+##################################
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing / coverage
+coverage/
+
+# TypeScript build info
+*.tsbuildinfo
+
+##################################
+# Backend (.NET / ASP.NET Core)
+##################################
+# Build results
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Dd]ebug/
+[Dd]ebug[Aa]ny[Cc][Pp][Uu]/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# EF Core
+**/Migrations/*.Designer.cs.bak
+
+# ASP.NET scaffolding
+ScaffoldingReadMe.txt
+
+# Publish output
+**/PublishProfiles/*.pubxml
+**/Properties/PublishProfiles/*
+publish/
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+
+##################################
+# Database
+##################################
+*.mdf
+*.ldf
+*.ndf
+*.bak
+
+##################################
+# Logs
+##################################
+logs/
+*.log
