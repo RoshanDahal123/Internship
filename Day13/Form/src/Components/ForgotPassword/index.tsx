@@ -4,36 +4,18 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import z from "zod";
+import { postJson } from "../../api/client";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-const REQUEST_OTP_URL = import.meta.env.VITE_API_URL_FORGOT_PASSWORD ?? "https://localhost:7239/api/auth/forgot-password";
-const VERIFY_OTP_URL = import.meta.env.VITE_API_URL_VERIFY_OTP ?? "https://localhost:7239/api/auth/verify-otp";
-const RESET_PASSWORD_URL = import.meta.env.VITE_API_URL_RESET_PASSWORD ?? "https://localhost:7239/api/auth/reset-password";
+
 
 const RSEND_COLLDOWN_SECONDS=60;
 
 type Step = "email"|"otp"|"reset";
 
 
-async function postJson<T>(url:string, body:unknown):Promise<T>{
-    const response = await fetch(url,{
-
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        
-        body:JSON.stringify(body),})
-        
-        if(!response.ok){
-            const message= await response 
-            .json()
-            .then(data=>data?.message)
-            .catch(()=>null);
-            throw new Error(message?? `Request failed with status${response.status}`) 
-        }
-        return response.json();
-    }
 
 export function ForgotPassoword(){
     const navigate= useNavigate();
@@ -41,7 +23,7 @@ export function ForgotPassoword(){
     const [isSubmitting,setIsSubmitting]= useState(false);
 
     const [cooldown, setCooldown]= useState(0);
-
+    const [resetToken, setResetToken] = useState("");
   // registeredEmail is carried forward from step 1 into steps 2 and 3,
   // since the OTP verify + reset calls both need it and we don't want
   // the user to retype it.
@@ -63,7 +45,7 @@ export function ForgotPassoword(){
     onSubmit:async({value})=>{
         setIsSubmitting(true);
         try{
-            await postJson(REQUEST_OTP_URL,{email:value.email})
+            await postJson("/auth/forgot-password",{email:value.email})
             setRegisteredEmail(value.email);
             setCooldown(RSEND_COLLDOWN_SECONDS);
             setStep('otp');
@@ -88,9 +70,13 @@ const otpForm = useForm({
     onSubmit:async({value})=>{
      setIsSubmitting(true);
      try{
-       await postJson(VERIFY_OTP_URL,{email:registeredEmail,otp:value.otp})
-       setStep("reset");
-       toast.success("OTP confirmed ");
+       const result = await postJson<{ resetToken: string }>("/auth/verify-otp", {
+        email: registeredEmail,
+        otp: value.otp,
+      });
+      setResetToken(result.resetToken);
+      setStep("reset");
+      toast.success("OTP confirmed");
      }
      catch(error){
       toast.error(error instanceof Error ? error.message:"Invalid or expired Otp");
@@ -105,9 +91,10 @@ const handleResend= async ()=>{
     if(cooldown>0)return;
     setIsSubmitting(true);
     try{
-        await postJson(REQUEST_OTP_URL,{email:registeredEmail});
+        await postJson("/auth/forgot-password",{email:registeredEmail});
         setCooldown(RSEND_COLLDOWN_SECONDS);
         toast.success("OTP resent");
+
     }
     catch(error){
         toast.error(error instanceof Error? error.message:"Couldn't resend OTP");
@@ -128,7 +115,8 @@ const resetForm = useForm({
 
         try{
             //server should re-validate the OTP server-side (short-lived token or the OTP itself) rather thatn trusting the client step state
-            await postJson(RESET_PASSWORD_URL,{email:registeredEmail, otp:otpForm.state.values.otp,newPassword:value.newPassword});
+            console.log(otpForm.state.values);
+            await postJson("/auth/reset-password",{email:registeredEmail,resetToken,newPassword:value.newPassword});
             toast.success("Passowrd updated-please log in");
             navigate("/login");
         }

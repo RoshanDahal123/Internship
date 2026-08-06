@@ -5,12 +5,15 @@ import { z } from "zod";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { postJson } from "../../api/client";
 
-const API_URL = import.meta.env.VITE_API_URL_LOGIN ?? "https://localhost:7239/api/auth/login";
+
 
 export function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+    
+        const navigate = useNavigate();
 
   const form = useForm({
     defaultValues: {
@@ -21,31 +24,9 @@ export function Login() {
     onSubmit: async ({ value }) => {
       setIsSubmitting(true);
       try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(value),
-        });
-
-        if (!response.ok) {
-          // 401 gets its own message — wrong credentials isn't a server error
-          if (response.status === 401) {
-            throw new Error("Invalid email or password");
-          }
-          throw new Error(`Login failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Server response:", data);
-
-        // // adjust this key to whatever your API actually returns
-        // if (data.token) {
-        //   localStorage.setItem("authToken", data.token);
-        // }
-
-        toast.success("Welcome back");
+       await postJson("/auth/login",value);
+       toast.success("Welcome Back");
+       navigate("/dashboard");
       } catch (error) {
         console.error("Login error:", error);
         const message = error instanceof Error ? error.message : "Login failed. Please try again.";

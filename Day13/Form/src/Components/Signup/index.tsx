@@ -3,11 +3,12 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { postJson } from "../../api/client";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "https://localhost:7239/api/auth/register";
+
 
 export function SignUp() {
     const navigate=useNavigate();
@@ -24,23 +25,9 @@ export function SignUp() {
     onSubmit: async ({ value }) => {
       setIsSubmitting(true);
       try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // this was the actual bug: the payload was never sent
-          body: JSON.stringify(value),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Registration failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Server response:", data);
+        await postJson("/auth/register",value);
         toast.success("Account created");
-        navigate('/');
+        navigate("/dashboard");
       } catch (error) {
         console.error("Signup error:", error);
         toast.error("Signup failed. Please try again.");
