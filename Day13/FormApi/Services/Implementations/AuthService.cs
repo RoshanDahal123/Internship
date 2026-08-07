@@ -109,7 +109,7 @@ public class AuthService : IAuthService
         return (ToDto(user), accessToken, refreshToken);
     }
 
-
+// Use case: silently renew the session when the access token has expired, without asking the user to log in again.
     public async Task<(string, string)> RefreshTokenAsync(string rawRefreshToken, string? ip)
     {
         var hash = _tokenService.HashToken(rawRefreshToken);
