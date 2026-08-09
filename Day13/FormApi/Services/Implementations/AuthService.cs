@@ -109,7 +109,7 @@ public class AuthService : IAuthService
         return (ToDto(user), accessToken, refreshToken);
     }
 
-
+// Use case: silently renew the session when the access token has expired, without asking the user to log in again.
     public async Task<(string, string)> RefreshTokenAsync(string rawRefreshToken, string? ip)
     {
         var hash = _tokenService.HashToken(rawRefreshToken);
@@ -139,6 +139,7 @@ public class AuthService : IAuthService
         // Rotate: revoke the used token, issue a new one
         storedToken.RevokedAt = DateTime.UtcNow;
         var (accessToken, newRefreshToken) = await IssueTokensAsync(storedToken.User, ip);
+        //just write-only later can be resued for things like admit/support tooling, forensic after a theft event ,a stricter reuse detection strategy
         storedToken.ReplacedByTokenHash = _tokenService.HashToken(newRefreshToken);
         await _db.SaveChangesAsync();
 
