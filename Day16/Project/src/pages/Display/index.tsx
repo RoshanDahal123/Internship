@@ -70,7 +70,7 @@ const Display=()=>{
          </div>
          {entries.length > 1 && (
         <button
-          onClick={() => dispatch(clearForm())}
+          onClick={handleReset}
           className="w-full mt-6 py-2.5 px-4 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg"
         >
           Clear all
