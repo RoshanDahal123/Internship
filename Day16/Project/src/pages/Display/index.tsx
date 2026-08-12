@@ -63,11 +63,26 @@ const Display=()=>{
               <div><dt className="font-medium text-gray-500 text-sm">Description</dt><dd>{entry.description || "—"}</dd></div>
               <div><dt className="font-medium text-gray-500 text-sm">Id</dt><dd>{entry.id|| "—"}</dd></div>
             </dl>
+            {entry.education.length > 0 && (
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <h4 className="font-medium text-gray-500 text-sm mb-2">Education</h4>
+        <ul className="space-y-2">
+          {entry.education.map((edu, i) => (
+            <li key={i} className="text-sm text-gray-800 bg-gray-50 rounded-lg p-2">
+              <span className="font-medium">{edu.degree}</span> — {edu.institutionName} ({edu.year})
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
             </div>
           ))
-          }
+ }
+           
 
+           
          </div>
+
          {entries.length > 1 && (
         <button
           onClick={handleReset}
