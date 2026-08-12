@@ -1,48 +1,40 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { submitForm } from "../../store/action";
 import { useAppDispatch } from "../../store/hooks";
-import type { FormData } from "../../types/formTypes";
 
+interface FormData {
+  name:string,
+  email:string,
+  age:number,
+  address:string,
+  description:string
 
+}
 
 
 
 const Login = () => {
 const dispatch= useAppDispatch();
 const navigate= useNavigate();
-    const [formData, setFormData]=useState<FormData>({
-        name:"",
-        email:"",
-        address:"",
-        age:1,
-        description:""
-    })
-     const [error, setError] = useState<string>("");
+   
+   const {register,formState:{errors},
+  handleSubmit}= useForm<FormData>({
+    defaultValues:{
+      name:"",
+      email:"",
+      age:1,
+      address:"",
+      description:""
+    }
+  });
  
    
-    const handleChange=(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
+   
 
-        const{name,value, type}= e.target;
-       setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value,
-    }));
-    }
-
-    const handleSubmit=(e:React.FormEvent<HTMLFormElement>)=>{
-        e.preventDefault();
-
-    if(!formData.name.trim()||!formData.email.trim()){
-        setError("Name and Email are required");
-        return;
-    }
-
-    setError("");
-    dispatch(submitForm(formData));
-     setFormData({ name: "", email: "", address: "", age: 1, description: "" });
+    const onSubmit=(data:FormData)=>{
+    dispatch(submitForm(data));
     navigate("/display");
-
     }
 
   return (
@@ -51,7 +43,7 @@ const navigate= useNavigate();
         User Information Form
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Input */}
         <div>
           <label htmlFor="Name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -60,13 +52,14 @@ const navigate= useNavigate();
           <input
             type="text"
             id="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
+            {...register("name",{required:true})}
+             aria-invalid={errors.name ? "true" : "false"}
             placeholder="John Doe"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 placeholder-gray-400"
           />
+          {errors.name?.type === "required" && (
+        <p role="alert" className="text-red-500">Name is required</p>
+      )}
         </div>
 
         {/* Email Input */}
@@ -76,16 +69,15 @@ const navigate= useNavigate();
           </label>
           <input
             type="email"
-            id="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
+          {...register("email",{required:"Email Address is Required"})}
+          aria-invalid={errors.email ? "true" : "false"}
             placeholder="john@example.com"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 placeholder-gray-400"
           />
         </div>
-
+         {errors.email&& <p role="alert">
+          {errors.email && <p role="alert">
+            {errors.email.message}</p>}</p>}
         {/* Age Input */}
         <div>
           <label htmlFor="Age" className="block text-sm font-medium text-gray-700 mb-1">
@@ -93,13 +85,8 @@ const navigate= useNavigate();
           </label>
           <input
             type="number"
-            id="Age"
-            name="age"
-            value={formData.age}
-            onChange={handleChange}
-            min={1}
-            max={120}
-            required
+          {...register("age",{required:true,min:1,max:100})}
+            
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800"
           />
         </div>
@@ -111,11 +98,8 @@ const navigate= useNavigate();
           </label>
           <input
             type="text"
-            id="Address"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            required
+   {...register("address",{required:true})}
+            
             placeholder="123 Main St, City, Country"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 placeholder-gray-400"
           />
@@ -127,15 +111,17 @@ const navigate= useNavigate();
             Description
           </label>
           <textarea
-            id="Description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
+          {...register("description",{required:true})}
+          rows={4}
             placeholder="Tell us a bit about yourself..."
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 placeholder-gray-400 resize-y"
+            area-invalude={errors.description?"true":"false"}
           />
+           {errors.description && <p role="alert">{errors.description.message}</p>}
+
         </div>
+         
+
 
         {/* Submit Button */}
         <button
