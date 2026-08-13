@@ -46,8 +46,10 @@ await characterApi.update(id,data);
 setCharacters((prev)=>prev.map( c=>c.id === id? {...c,...data}:c))
  },[])
 
+ 
+
  const deleteCharacter= useCallback(async (id:number)=>{
-    await characterApi.delete(id);
+    await characterApi.remove(id);
     setCharacters((prev)=>prev.filter((c)=>c.id!==id));
  },[])
 

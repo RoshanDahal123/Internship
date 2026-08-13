@@ -7,5 +7,5 @@ export const characterApi={
     getById:(id:number)=>httpClient.get<Character>(`${ROUTE}/${id}`),
     create:(data:CreateCharacterRequest)=>httpClient.post<Character>(ROUTE,data),
     update:(id:number,data:UpdateCharacterRequest)=>httpClient.put<void>(`${ROUTE}/${id}`, data),
-    delete:(id:number)=>httpClient.delete<void>(`${ROUTE}/${id}`)
+   remove :(id:number)=>httpClient.delete<void>(`${ROUTE}/${id}`)
 }

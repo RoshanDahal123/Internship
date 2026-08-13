@@ -2,7 +2,7 @@
     font-family:var(--font-display);
     font-weight:500;
     font-size:0.9rem;
-    padding:0.65rem 1.25rem;
+    padding:8px 16px;
     border-radius:var(--radius-sm);
     border:1px solid transparent;
     cursor:pointer;
