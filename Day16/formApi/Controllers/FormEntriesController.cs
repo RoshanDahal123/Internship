@@ -31,7 +31,7 @@ namespace formApi.Controllers
 
         }
 
-
+        [HttpPost]
 
         public async Task<ActionResult<FormEntryDto>>Create(CreateFormEntryDto dto)
         {
@@ -71,9 +71,32 @@ namespace formApi.Controllers
                 return Ok(MapToDto(entry));
         }
 
+        [HttpDelete("{id:int}")]
 
+        public async Task<IActionResult> Delete(int id)
+        {
+            var entry = await _context.UserEntries.FindAsync(id);
+            if (entry == null)
+            {
+                return NotFound(new { message = $"Entry with id {id} not found" });
+            }
+            _context.UserEntries.Remove(entry);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        [HttpDelete("all")]
+        public async Task<IActionResult> DeleteAll()
+        {
+            var hasEntries = await _context.UserEntries.AnyAsync(); // properly awaited, returns bool
 
+            if (!hasEntries)
+            {
+                return NotFound(new { message = "No entries found to delete." });
+            }
 
+            var deletedCount = await _context.UserEntries.ExecuteDeleteAsync();
+            return Ok(new { message = $"Deleted {deletedCount} entries." });
+        }
         private static FormEntryDto MapToDto(UserEntry entity)
         {
             return new FormEntryDto

@@ -2,7 +2,7 @@
 
 public class Education
 {
-    public string Id { get; set; }
+    public int Id { get; set; }
     public string Degree { get; set; } = string.Empty;
 
     public string InstitutionName { get; set; } = string.Empty;
