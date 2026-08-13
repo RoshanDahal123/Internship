@@ -11,21 +11,24 @@ import {
   Trash2,
   User,
 } from "lucide-react";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { submitForm } from "../../store/action";
+import { createFormEntry } from "../../api/formApi";
 import { useAppDispatch } from "../../store/hooks";
 import type { FormData } from "../../types/formTypes";
+import { addEntryLocally } from "../../store/action";
 
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+ const [submitError, setSubmitError]=useState("");
+ const[isSubmitting, setIsSubmitting]=useState(false);
   const {
     register,
     control,
     formState: { errors },
-    handleSubmit,
+    handleSubmit
   } = useForm<FormData>({
     defaultValues: {
       name: "",
@@ -42,9 +45,20 @@ const Login = () => {
     name: "education",
   });
 
-  const onSubmit = (data: FormData) => {
-    dispatch(submitForm(data));
-    navigate("/display");
+  const onSubmit =async (data: FormData) => {
+    setSubmitError("");
+   setIsSubmitting(true);
+    try{
+      const savedEntry=await createFormEntry(data);
+      dispatch(addEntryLocally(savedEntry));
+      navigate('/display');
+    }
+    catch(err){
+ setSubmitError("Failed to submit form. Please try again.");
+      console.error(err);
+    }finally{
+      setIsSubmitting(false);
+    }
   };
 
   // Shared classes so every input/textarea stays visually consistent —
@@ -352,15 +366,17 @@ const Login = () => {
               ))}
             </div>
           </div>
-
+    <p role="alert" className="text-red-500 text-sm text-center">{submitError}</p>
           {/* Submit */}
           <button
             type="submit"
             className="w-full mt-4 flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={isSubmitting}
           >
             <Send className="w-4 h-4" />
-            Submit
+           {isSubmitting ? "Submitting":"Submit"}
           </button>
+          
         </form>
       </div>
     </div>

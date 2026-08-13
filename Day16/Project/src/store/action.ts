@@ -1,34 +1,49 @@
 
-import type { FormData } from '../types/formTypes';
-import {SUBMIT_FORM,CLEAR_FORM,DELETE_ENTRY} from './actionTypes';
+import type { FormData, FormEntry } from '../types/formTypes';
+import {ADD_ENTRY_LOCALLY, FETCH_FAILURE, FETCH_START, FETCH_SUCCESS} from './actionTypes';
 
-interface SubmitFormAction{
-    type:typeof SUBMIT_FORM,
-    payload:FormData
+interface FetchStartAction {
+  type: typeof FETCH_START;
+}
+interface FetchSuccessAction {
+  type: typeof FETCH_SUCCESS;
+  payload: FormEntry[];
+}
+interface FetchFailureAction {
+  type: typeof FETCH_FAILURE;
+  payload: string;
+}
+interface AddEntryLocallyAction {
+  type: typeof ADD_ENTRY_LOCALLY;
+  payload: FormEntry;
 }
 
-interface ClearFormAction{
-    type:typeof CLEAR_FORM,
-}
-interface DeleteEntryAction{
-    type:typeof DELETE_ENTRY;
-    payload:string
-}
 
+export type FormActionTypes =
+  | FetchStartAction
+  | FetchSuccessAction
+  | FetchFailureAction
+  | AddEntryLocallyAction;
 
-export type FormActionTypes= SubmitFormAction| ClearFormAction|DeleteEntryAction;
-
-export const submitForm=(data:FormData):SubmitFormAction=>({
-    type:SUBMIT_FORM,
-    payload:data,
+export const fetchStart=():FetchStartAction=>({
+    type:FETCH_START
 })
 
-export const clearForm =():ClearFormAction=>({
-    type:CLEAR_FORM
-})
+export const fetchSuccess = (entries: FormEntry[]): FetchSuccessAction => ({
+  type: FETCH_SUCCESS,
+  payload: entries,
+});
 
-export const deleteEntry=(id:string):DeleteEntryAction=>({
-    type: DELETE_ENTRY,
-    payload:id
-})
+export const fetchFailure = (message: string): FetchFailureAction => ({
+  type: FETCH_FAILURE,
+  payload: message,
+});
+
+
+export const addEntryLocally=(entry:FormEntry):AddEntryLocallyAction=>(
+{
+type:ADD_ENTRY_LOCALLY,
+payload:entry,
+});
+
 
