@@ -14,5 +14,5 @@ export interface FormData {
 
 }
 export interface FormEntry extends FormData{
-id:string;
+id:number;
 }

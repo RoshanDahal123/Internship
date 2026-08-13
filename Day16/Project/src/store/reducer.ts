@@ -1,6 +1,6 @@
 import type { FormEntry } from "../types/formTypes";
 import type { FormActionTypes } from "./action";
-import { FETCH_START, FETCH_SUCCESS, FETCH_FAILURE, ADD_ENTRY_LOCALLY} from "./actionTypes";
+import { ADD_ENTRY_LOCALLY, FETCH_FAILURE, FETCH_SUCCESS, REMOVE_ALL_ENTRIES, REMOVE_ENTRY } from "./actionTypes";
 
 export interface FormState{
   entries:FormEntry[];
@@ -31,7 +31,15 @@ export const formReducer=(
         case ADD_ENTRY_LOCALLY:
             return{...state,entries:[...state.entries,action.payload]}
     
-
+        case REMOVE_ENTRY:
+            
+            return{...state,entries:
+                state.entries.filter(
+                    (entry)=>(entry.id   !== action.payload)
+                )
+            }
+        case REMOVE_ALL_ENTRIES:
+            return{...state,entries:[]}
          default:
             return state;
     }

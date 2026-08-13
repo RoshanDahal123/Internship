@@ -1,6 +1,6 @@
 
-import type { FormData, FormEntry } from '../types/formTypes';
-import {ADD_ENTRY_LOCALLY, FETCH_FAILURE, FETCH_START, FETCH_SUCCESS} from './actionTypes';
+import type { FormEntry } from '../types/formTypes';
+import { ADD_ENTRY_LOCALLY, FETCH_FAILURE, FETCH_START, FETCH_SUCCESS, REMOVE_ALL_ENTRIES, REMOVE_ENTRY } from './actionTypes';
 
 interface FetchStartAction {
   type: typeof FETCH_START;
@@ -17,13 +17,23 @@ interface AddEntryLocallyAction {
   type: typeof ADD_ENTRY_LOCALLY;
   payload: FormEntry;
 }
+interface RemoveAllEntriesAction{
+    type: typeof REMOVE_ALL_ENTRIES
+}
+interface RemoveEntryAction{
+    type: typeof REMOVE_ENTRY;
+    payload:number;
+}
 
 
 export type FormActionTypes =
   | FetchStartAction
   | FetchSuccessAction
   | FetchFailureAction
-  | AddEntryLocallyAction;
+  | AddEntryLocallyAction
+  |RemoveEntryAction
+  |RemoveAllEntriesAction
+
 
 export const fetchStart=():FetchStartAction=>({
     type:FETCH_START
@@ -46,4 +56,12 @@ type:ADD_ENTRY_LOCALLY,
 payload:entry,
 });
 
+export const removeEntry=(id:number):RemoveEntryAction=>({
+    type:REMOVE_ENTRY,
+    payload: id,
+})
+
+export const removeAllEntries=():RemoveAllEntriesAction=>({
+type:REMOVE_ALL_ENTRIES
+})
 

@@ -1,12 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { getFormEntries } from "../../api/formApi";
-import { fetchFailure, fetchStart, fetchSuccess } from "../../store/action";
+import {
+  deleteAllEntries,
+  deleteEntry,
+  getFormEntries,
+} from "../../api/formApi";
+import {
+  fetchFailure,
+  fetchStart,
+  fetchSuccess,
+  removeAllEntries,
+  removeEntry,
+} from "../../store/action";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
 const Display = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingAll, setDeletingAll] = useState<boolean>(false);
+  const [deleteError, setDeleteError] = useState("");
   const { entries, loading, error } = useAppSelector((state) => state.form);
 
   useEffect(() => {
@@ -41,7 +54,39 @@ const Display = () => {
     );
   }
 
- 
+  const handleClearEntry = async (id: number) => {
+    setDeleteError("");
+    setDeletingId(id);
+
+    try {
+      await deleteEntry(id);
+      dispatch(removeEntry(id));
+      console.log("Deleted item:", deletingId);
+    } catch (error) {
+      setDeleteError("Error while deleting.Please try again ");
+      console.log(deleteError);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleClearAll = async () => {
+    const confirmed = window.confirm(
+      `Delete all ${entries.length} entries? This cannot be undone.`,
+    );
+    if (!confirmed) return;
+    setDeleteError("");
+    setDeletingAll(true);
+    try {
+      const deleted = await deleteAllEntries();
+      dispatch(removeAllEntries());
+      console.log(deleted);
+    } catch (error) {
+      setDeleteError("Error occured while deleting.Please try again later");
+    } finally {
+      setDeletingAll(false);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -66,6 +111,9 @@ const Display = () => {
             <button
               className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-sm"
               aria-label="Delete entry"
+              onClick={() => {
+                handleClearEntry(entry.id);
+              }}
             >
               ✕
             </button>
@@ -122,9 +170,16 @@ const Display = () => {
       {entries.length > 1 && (
         <button
           className="w-full mt-6 py-2.5 px-4 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg"
+          onClick={handleClearAll}
         >
-          Clear all
+          {deletingAll ? "Deleting..." : "Delete All"}
         </button>
+      )}
+
+      {deleteError && (
+        <p role="alert" className="text-red-500 text-sm mb-4">
+          {deleteError}
+        </p>
       )}
     </div>
   );
