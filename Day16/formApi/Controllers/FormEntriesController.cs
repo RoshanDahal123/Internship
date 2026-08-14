@@ -4,7 +4,7 @@ using formApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using System.Text.Json;
 namespace formApi.Controllers
 {
     [Route("api/[controller]")]
@@ -12,32 +12,80 @@ namespace formApi.Controllers
     public class FormEntriesController : ControllerBase
     {
         private readonly AppDBContext _context;
-
-        public FormEntriesController(AppDBContext context)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public FormEntriesController(AppDBContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
         [HttpGet]
         public async Task<ActionResult<List<FormEntryDto>>> GetAll()
         {
             var entries = await _context.UserEntries
                 .Include(u => u.Education)
-                .Select(u => MapToDto(u))
                 .ToListAsync();
 
-
-                return Ok(entries);//without this ,Education would come back
+            var dtos =entries.Select(u => MapToDto(u)).ToList();
+            return Ok(dtos);//without this ,Education would come back
 
 
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")] //tells swagger/clients this endpount excepts a file not a raw json object
 
-        public async Task<ActionResult<FormEntryDto>>Create(CreateFormEntryDto dto)
+        public async Task<ActionResult<FormEntryDto>>Create([FromForm] CreateFormEntryFormData dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Email))
                 return BadRequest(new { message = "Name and Email are required." });
 
+            List<EducationDto> educationList;
+
+            try
+            {
+                educationList= string.IsNullOrEmpty(dto.EducationJson)
+                    ? new List<EducationDto>()
+                    : JsonSerializer.Deserialize<List<EducationDto>>(dto.EducationJson,
+                      new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<EducationDto>();
+            }
+            catch (JsonException)
+            {
+                return BadRequest(new {message= "Invalid education data format. Please provide valid JSON." });
+            }
+            string? savedCvPath = null;
+            if(dto.CvFile is not null && dto.CvFile.Length > 0)
+            {
+                // Basic validation — worth having on any file upload endpoint
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+
+                var extension = Path.GetExtension(dto.CvFile.FileName).ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(extension))
+                    return BadRequest(new { message = "Only PDF or Word documents are allowed for CVUpload" });
+
+                if (dto.CvFile.Length > 5 * 1024 * 1024)//5MB limit
+                    return BadRequest(new { message = "CV file must be under 5MB." });
+
+                var uploadsFolder= Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+
+                if(!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                // Generate a unique filename — never trust/reuse the original filename directly,
+                // two people uploading "resume.pdf" would otherwise overwrite each other's file
+
+                var uniqueFileName=$"{Guid.NewGuid()}{extension}";
+
+                var filePath= Path.Combine(uploadsFolder, uniqueFileName);
+
+                using(var stream = new FileStream(filePath,FileMode.Create))
+                {
+                    await dto.CvFile.CopyToAsync(stream);
+                }
+                savedCvPath = $"/uploads/{uniqueFileName}";
+            }
+            
+            
             var entity = new UserEntry
             {
                 Name = dto.Name,
@@ -45,7 +93,9 @@ namespace formApi.Controllers
                 Age = dto.Age,
                 Address = dto.Address,
                 Description = dto.Description,
-                Education = dto.Education.Select(e => new Education
+                DateOfBirth=dto.DateOfBirth,
+                CvFilePath = savedCvPath,
+                Education = educationList.Select(e => new Education
                 {
                     Degree = e.Degree,
                     InstitutionName = e.InstitutionName,
@@ -57,6 +107,7 @@ namespace formApi.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new { id = entity.Id }, MapToDto(entity));
         }
+        
         [HttpGet("{id:int}")]
         public async Task<ActionResult<FormEntryDto>> GetById(int id)
         {
@@ -97,7 +148,7 @@ namespace formApi.Controllers
             var deletedCount = await _context.UserEntries.ExecuteDeleteAsync();
             return Ok(new { message = $"Deleted {deletedCount} entries." });
         }
-        private static FormEntryDto MapToDto(UserEntry entity)
+        private FormEntryDto MapToDto(UserEntry entity)
         {
             return new FormEntryDto
             {
@@ -107,6 +158,11 @@ namespace formApi.Controllers
                 Age = entity.Age,
                 Address = entity.Address,
                 Description = entity.Description,
+                DateOfBirth = entity.DateOfBirth,
+                CvFileUrl=entity.CvFilePath is not null
+                ? $"{Request.Scheme}://{Request.Host}{entity.CvFilePath}"
+                :null,
+
                 Education = entity.Education.Select(e => new EducationDto
                 {
                     Degree = e.Degree,
@@ -115,6 +171,9 @@ namespace formApi.Controllers
                 }).ToList()
 
             };
+
+
+
         }
     }
 }

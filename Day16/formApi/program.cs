@@ -36,5 +36,6 @@ app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles();// server the uploaded files from the wwwroot folder
 
 app.Run();

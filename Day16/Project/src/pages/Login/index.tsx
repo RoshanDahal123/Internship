@@ -15,27 +15,31 @@ import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { createFormEntry } from "../../api/formApi";
-import { useAppDispatch } from "../../store/hooks";
-import type { FormData } from "../../types/formTypes";
-import { addEntryLocally } from "../../store/action";
+// import { useAppDispatch } from "../../store/hooks";
+import CvUploadField from "../../components/CvUploadField";
+import DatePickerField from "../../components/DatePickerField";
+import type { FormValues } from "../../types/formTypes";
+// import { addEntryLocally } from "../../store/action";
 
 const Login = () => {
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const navigate = useNavigate();
- const [submitError, setSubmitError]=useState("");
- const[isSubmitting, setIsSubmitting]=useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     control,
     formState: { errors },
-    handleSubmit
-  } = useForm<FormData>({
+    handleSubmit,
+  } = useForm<FormValues>({
     defaultValues: {
       name: "",
       email: "",
       age: 1,
       address: "",
       description: "",
+      dateOfBirth: null,
+      cvFile: null,
       education: [],
     },
   });
@@ -45,18 +49,16 @@ const Login = () => {
     name: "education",
   });
 
-  const onSubmit =async (data: FormData) => {
+  const onSubmit = async (data: FormValues) => {
     setSubmitError("");
-   setIsSubmitting(true);
-    try{
-      const savedEntry=await createFormEntry(data);
-      dispatch(addEntryLocally(savedEntry));
-      navigate('/display');
-    }
-    catch(err){
- setSubmitError("Failed to submit form. Please try again.");
+    setIsSubmitting(true);
+    try {
+      await createFormEntry(data);
+      navigate("/display");
+    } catch (err) {
+      setSubmitError("Failed to submit form. Please try again.");
       console.error(err);
-    }finally{
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -195,7 +197,15 @@ const Login = () => {
               )}
             </div>
           </div>
-
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <DatePickerField
+    name="dateOfBirth"
+    control={control}
+    label="Date of Birth"
+    error={errors.dateOfBirth?.message}
+  />
+  <CvUploadField name="cvFile" control={control} label="CV / Resume" />
+</div>
           {/* Description */}
           <div>
             <label
@@ -295,12 +305,9 @@ const Login = () => {
                         <input
                           type="text"
                           placeholder="Institution Name"
-                          {...register(
-                            `education.${index}.institutionName`,
-                            {
-                              required: "Required",
-                            },
-                          )}
+                          {...register(`education.${index}.institutionName`, {
+                            required: "Required",
+                          })}
                           aria-invalid={
                             errors.education?.[index]?.institutionName
                               ? "true"
@@ -352,7 +359,6 @@ const Login = () => {
                       )}
                     </div>
 
-                   
                     <button
                       type="button"
                       onClick={() => remove(index)}
@@ -366,7 +372,9 @@ const Login = () => {
               ))}
             </div>
           </div>
-    <p role="alert" className="text-red-500 text-sm text-center">{submitError}</p>
+          <p role="alert" className="text-red-500 text-sm text-center">
+            {submitError}
+          </p>
           {/* Submit */}
           <button
             type="submit"
@@ -374,9 +382,8 @@ const Login = () => {
             disabled={isSubmitting}
           >
             <Send className="w-4 h-4" />
-           {isSubmitting ? "Submitting":"Submit"}
+            {isSubmitting ? "Submitting" : "Submit"}
           </button>
-          
         </form>
       </div>
     </div>

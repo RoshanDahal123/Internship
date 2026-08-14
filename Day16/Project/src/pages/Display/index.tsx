@@ -1,5 +1,6 @@
+import { FileText } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   deleteAllEntries,
   deleteEntry,
@@ -134,6 +135,10 @@ const Display = () => {
                 <dt className="font-medium text-gray-500 text-sm">Address</dt>
                 <dd>{entry.address}</dd>
               </div>
+               <div>
+                <dt className="font-medium text-gray-500 text-sm">Date of Birth</dt>
+                <dd>{new Date(entry.dateOfBirth).toLocaleDateString()}</dd>
+              </div>
               <div>
                 <dt className="font-medium text-gray-500 text-sm">
                   Description
@@ -145,6 +150,21 @@ const Display = () => {
                 <dd>{entry.id || "—"}</dd>
               </div>
             </dl>
+             
+             {entry.cvFileUrl && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                
+                <Link  to={entry.cvFileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  <FileText className="w-4 h-4" /> View CV
+                </Link>
+              </div>
+            )}
+             
+            
             {entry.education.length > 0 && (
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <h4 className="font-medium text-gray-500 text-sm mb-2">
