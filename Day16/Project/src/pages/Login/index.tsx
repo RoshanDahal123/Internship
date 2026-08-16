@@ -197,7 +197,7 @@ const Login = () => {
               )}
             </div>
           </div>
-<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
   <DatePickerField
     name="dateOfBirth"
     control={control}
@@ -205,7 +205,7 @@ const Login = () => {
     error={errors.dateOfBirth?.message}
   />
   <CvUploadField name="cvFile" control={control} label="CV / Resume" />
-</div>
+
           {/* Description */}
           <div>
             <label

@@ -1,0 +1,11 @@
+{
+  "todos": [
+    {
+      "userId": 1,
+      "title": "how are you",
+      "completed": false,
+      "id": "znuZgsGA6l4"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
