@@ -21,7 +21,7 @@ import DatePickerField from "../../components/DatePickerField";
 import type { FormValues } from "../../types/formTypes";
 // import { addEntryLocally } from "../../store/action";
 
-const Login = () => {
+const UserForm = () => {
   // const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [submitError, setSubmitError] = useState("");
@@ -390,4 +390,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default UserForm;

@@ -1,16 +1,16 @@
 
 
 
-import {BrowserRouter, Routes,Route} from "react-router";
-import Login from "./pages/Login";
+import { BrowserRouter, Route, Routes } from "react-router";
 import Display from "./pages/Display";
+import UserForm from "./pages/UserForm";
 const App = () => {
   return (
     <BrowserRouter>
      
      <Routes>
       
-      <Route path='/' element={<Login/>} />
+      <Route path='/' element={<UserForm/>} />
       <Route path='/display' element={<Display/>}/>
       
     </Routes>
