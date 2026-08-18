@@ -4,7 +4,7 @@ import type { FormEntry, FormValues } from "../types/formTypes";
 export const formApi = createApi({
   reducerPath: "formApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "import.meta.env.VITE_API_BASE_URL",
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
   }),
   tagTypes: ["FormEntry"],
   endpoints: (builder) => ({
@@ -21,10 +21,11 @@ export const formApi = createApi({
     // POST /api/formentries — multipart, because of the CV file
     createFormEntry: builder.mutation<FormEntry, FormValues>({
       query: (data) => {
+        console.log(data);
         const multipart = new FormData();
         multipart.append("Name", data.name);
         multipart.append("Email", data.email);
-        multipart.append("Age", String(data.age));
+        multipart.append("Age", Number(data.age));
         multipart.append("Address", data.address);
         multipart.append("Description", data.description);
         multipart.append(
@@ -35,10 +36,11 @@ export const formApi = createApi({
         if (data.cvFile) {
           multipart.append("CvFile", data.cvFile);
         }
+        console.log(multipart);
         return {
           url: "/formentries",
           method: "POST",
-          body: "multipart",
+          body:multipart,
           // IMPORTANT: do NOT set Content-Type manually here.
           // The browser must set it itself (including the multipart boundary
           // string), which only happens if you let fetch infer it from the

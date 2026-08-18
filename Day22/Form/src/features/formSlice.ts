@@ -1,58 +1,49 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FormEntry } from "../types/formTypes";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-
-export interface FormState{
-  entries:FormEntry[];
-  loading:boolean;
-  error:string|null;
-}
-const initialState:FormState={
-    entries:[],
-    loading:false,
-    error:null
-
+interface FormUIState{
+   searchTerm:string; // filters the entries list in Display.tsx
+   isDeleteAllModalOpen:boolean;//controls the confirm dialog
+   entryPendingDeleteId:number|null;
 }
 
+const initialState:FormUIState={
+   searchTerm:"",
+   isDeleteAllModalOpen:false,
+   entryPendingDeleteId:null
 
- const formSlice=createSlice({
-    name:"form",
-    initialState,
-    reducers:{
-     fetchStart:(state:FormState)=>{
-        state.loading=true;
-        state.error=null;
-     },
-     fetchSuccess:(state:FormState,action:PayloadAction<FormEntry[]>)=>{
-        state.loading=false;
-        state.entries=action.payload;
-     },
-     fetchFailure:(state:FormState,action:PayloadAction<string>)=>{
-        state.loading=false;
-        state.error=action.payload;
-     },
-     addEntryLocally:(state:FormState, action:PayloadAction<FormEntry>)=>{
-        //immer lets yoy write directly
-        state.entries.push(action.payload);
-     },
-     removeEntry:(state:FormState,action:PayloadAction<number>)=>{
-        state.entries= state.entries.filter(entry=>entry.id!==action.payload)
-     },
-     removeAllEntries:(state:FormState)=>{
-        state.entries=[];
-     },
+}
+
+
+const formSlice= createSlice({
+   name:"form",
+   initialState,
+   reducers:{
+    setSearchTerm:(state:FormUIState, action:PayloadAction<string>)=>{
+      state.searchTerm=action.payload;
     },
-});
+    clearSearchTerm:(state)=>{
+      state.searchTerm=""
+    },
+    openDeleteAllModal: (state) => {
+      state.isDeleteAllModalOpen = true;
+    },
+
+    closeDeleteAllModal:(state)=>{
+      state.isDeleteAllModalOpen=false;
+    },
+    setEntryPendingDelete:(state,action:PayloadAction<number |null>)=>{
+      state.entryPendingDeleteId= action.payload;
+    },
+    
+   }
+})
 
 export const {
-    fetchStart,
-    fetchSuccess,
-  fetchFailure,
-  addEntryLocally,
-  removeEntry,
-  removeAllEntries
-
-
-}= formSlice.actions;
+  setSearchTerm,
+  clearSearchTerm,
+  openDeleteAllModal,
+  closeDeleteAllModal,
+  setEntryPendingDelete,
+} = formSlice.actions;
 
 export default formSlice.reducer;

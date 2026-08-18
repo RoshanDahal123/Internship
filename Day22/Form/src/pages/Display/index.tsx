@@ -1,14 +1,20 @@
 import { FileText } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import {
   useDeleteAllEntriesMutation,
   useDeleteFormEntryMutation,
   useGetFormEntriesQuery,
 } from "../../features/formApiSlice";
+import { closeDeleteAllModal, openDeleteAllModal, setSearchTerm } from "../../features/formSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/reducer-hook";
 
 const Display = () => {
+  const dispatch=useAppDispatch();
   const navigate = useNavigate();
+
+  const {searchTerm, isDeleteAllModalOpen}= useAppSelector((state)=>state.form);
 const[deleteError,setDeleteError]=useState("");
 //Replaces: useEffect + dispatch(fetchStart/fetchSuccess/fetchFailure) +
   // useAppSelector(state => state.form). RTK Query fetches on mount,
@@ -21,10 +27,17 @@ const{
   isError
 }= useGetFormEntriesQuery();
 
-
 const[deleteFormEntry,{isLoading:isDeletingOne}]= useDeleteFormEntryMutation();
 
 const[deleteAllEntries,{isLoading:isDeletingAll}]= useDeleteAllEntriesMutation();
+// Filter entries dynamically based on RTK Query data & Redux search term
+  const filteredEntries = useMemo(() => {
+    if (!searchTerm.trim()) return entries;
+    return entries.filter((entry) =>
+      entry.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [entries, searchTerm]);
+
 
 const handleClearEntry= async(id:number)=>{
   setDeleteError("");
@@ -36,20 +49,10 @@ const handleClearEntry= async(id:number)=>{
   }
 }
 
-const handleClearAll= async()=>{
-  const confirmed = window.confirm(
-      `Delete all ${entries.length} entries? This cannot be undone.`
-    );
-    if (!confirmed) return;
-
-    setDeleteError("");
-
-    try{
-      await deleteAllEntries().unwrap();
-    }catch(err){
-      setDeleteError("Error occured whike deketing. Please try again later");
-    }
-}
+const handleconfirmDeleteAll = async () => {
+    dispatch(closeDeleteAllModal());
+    await deleteAllEntries().unwrap();
+  };
 
 
 
@@ -104,8 +107,17 @@ const handleClearAll= async()=>{
         </button>
       </div>
 
+
+     <input type="text" 
+     value={searchTerm}
+     onChange={(e)=>dispatch(setSearchTerm(e.target.value))}
+     placeholder="Search by name...."
+     className="w-full mb-6 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 "
+     />
+
+
       <div className="space-y-4">
-        {entries.map((entry) => (
+        {filteredEntries.map((entry) => (
           <div
             key={entry.id}
             className="bg-white rounded-xl shadow-md border border-gray-100 p-5 relative"
@@ -120,6 +132,7 @@ const handleClearAll= async()=>{
             >
               ✕
             </button>
+
             <dl className="space-y-2 text-gray-800">
               <DetailItem label="Name" value={entry.name} />
               <DetailItem label="Email" value={entry.email} />
@@ -173,7 +186,8 @@ const handleClearAll= async()=>{
       {entries.length > 1 && (
         <button
           className="w-full mt-6 py-2.5 px-4 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg"
-          onClick={handleClearAll}
+          onClick={()=>dispatch(openDeleteAllModal())}
+          disabled={isDeletingAll}
         >
           {isDeletingAll ? "Deleting..." : "Delete All"}
         </button>
@@ -184,6 +198,13 @@ const handleClearAll= async()=>{
           {deleteError}
         </p>
       )}
+       <ConfirmDialog
+        open={isDeleteAllModalOpen}
+        title="Delete all entries?"
+        message={`This will permanently delete all ${entries.length} entries. This cannot be undone.`}
+        onConfirm={handleconfirmDeleteAll}
+        onCancel={() => dispatch(closeDeleteAllModal())}
+      />
     </div>
   );
 };

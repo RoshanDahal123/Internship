@@ -28,7 +28,7 @@ function FormTextArea<T extends FieldValues>({
   icon: Icon,
   label,
   placeholder,
-  rows,
+  rows=4
 }: FormTextareaProps<T>) {
   return (
     <div>
@@ -39,16 +39,17 @@ function FormTextArea<T extends FieldValues>({
       )}
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Icon className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
         )}
-        <textarea {...register(name, rules)} rows={rows}>
-          placeholder={placeholder}
+        <textarea {...register(name, rules)}
+        rows={rows}
+           placeholder={placeholder}
           aria-invalid={error ? "true" : "false"}
           className=
           {`w-full pl-10 pr-3 py-2.5 border rounded-lg shadow-sm text-gray-800 placeholder-gray-400 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y ${
             error ? "border-red-400 bg-red-50/40" : "border-gray-300"
           }`}
-        </textarea>
+        />
       </div>
       {error && (
         <p role="alert" className="text-red-500 text-xs mt-1.5">

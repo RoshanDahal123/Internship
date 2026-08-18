@@ -1,7 +1,6 @@
 ﻿using formApi.Data;
 using formApi.DTOs;
 using formApi.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -56,7 +55,7 @@ namespace formApi.Controllers
             if(dto.CvFile is not null && dto.CvFile.Length > 0)
             {
                 // Basic validation — worth having on any file upload endpoint
-                var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx"};
 
                 var extension = Path.GetExtension(dto.CvFile.FileName).ToLowerInvariant();
 

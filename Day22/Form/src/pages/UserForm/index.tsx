@@ -6,7 +6,7 @@ import {
   MapPin,
   Plus,
   Send,
-  User
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -24,7 +24,7 @@ const UserForm = () => {
   const navigate = useNavigate();
 
   const [submitError, setSubmitError] = useState("");
-  
+
   const [createFormEntry, { isLoading: isSubmitting }] =
     useCreateFormEntryMutation();
 
@@ -68,7 +68,7 @@ const UserForm = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 py-10 px-4">
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         {/* Header banner — gives the form a "product" feel instead of a bare card */}
         <div className="bg-linear-to-r from-blue-600 to-indigo-600 px-8 py-7">
           <h2 className="text-2xl font-bold text-white text-center">
@@ -106,7 +106,7 @@ const UserForm = () => {
 
           {/* Age + Adddress share a row on larger screens — saves vertical space */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 ">
             <div className="sm:col-span-1">
               <FormInput<FormValues>
                 name="age"
@@ -122,29 +122,35 @@ const UserForm = () => {
                 label="Age"
                 type="number"
               />
+            </div>
 
-              <div className="sm:col-span-2">
-                <FormInput<FormValues>
-                  name="address"
-                  register={register}
-                  rules={{ required: "Address is required" }}
-                  error={errors.address}
-                  icon={MapPin}
-                  label="Address"
-                  placeholder="123 Main St, City, Country"
-                />
-              </div>
+            <div className="sm:col-span-2">
+              <FormInput<FormValues>
+                name="address"
+                register={register}
+                rules={{ required: "Address is required" }}
+                error={errors.address}
+                icon={MapPin}
+                label="Address"
+                placeholder="123 Main St, City, Country"
+              />
             </div>
           </div>
-
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-1">
           <DatePickerField
             name="dateOfBirth"
             control={control}
             label="Date of Birth"
             error={errors.dateOfBirth?.message}
-          />
+            />
+            </div>
 
+             <div className="sm:col-span-2">
           <CvUploadField name="cvFile" control={control} label="CV / Resume" />
+
+             </div>
+            </div>
 
           {/* Description */}
 
@@ -159,16 +165,24 @@ const UserForm = () => {
             error={errors.description}
           />
 
- {/* Education */}
+          {/* Education */}
           <div className="pt-2">
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-blue-600" />
-                <label className="text-sm font-semibold text-gray-700">Education</label>
+                <label className="text-sm font-semibold text-gray-700">
+                  Education
+                </label>
               </div>
               <button
                 type="button"
-                onClick={() => append({ degree: "", institutionName: "", year: new Date().getFullYear() })}
+                onClick={() =>
+                  append({
+                    degree: "",
+                    institutionName: "",
+                    year: new Date().getFullYear(),
+                  })
+                }
                 className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-200 hover:border-blue-600 px-3 py-1.5 rounded-lg transition-colors duration-150"
               >
                 <Plus className="w-4 h-4" /> Add Education
@@ -177,7 +191,8 @@ const UserForm = () => {
 
             {fields.length === 0 && (
               <p className="text-sm text-gray-400 italic border border-dashed border-gray-200 rounded-lg py-4 text-center">
-                No education added yet — click "Add Education" to include your qualifications.
+                No education added yet — click "Add Education" to include your
+                qualifications.
               </p>
             )}
 
@@ -195,7 +210,9 @@ const UserForm = () => {
           </div>
 
           {submitError && (
-            <p role="alert" className="text-red-500 text-sm text-center">{submitError}</p>
+            <p role="alert" className="text-red-500 text-sm text-center">
+              {submitError}
+            </p>
           )}
 
           <button
@@ -213,8 +230,3 @@ const UserForm = () => {
 };
 
 export default UserForm;
-         
-
-
-
-  

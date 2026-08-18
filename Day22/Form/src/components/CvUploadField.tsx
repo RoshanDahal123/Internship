@@ -39,11 +39,11 @@ function CvUploadField<T extends FieldValues>({ name, control, label }: CvUpload
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className={`w-full flex flex-col items-center justify-center gap-2 py-6 border-2 border-dashed rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors ${
+          className={`w-full  py-4 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors ${
             error ? "border-red-400" : "border-gray-300"
           }`}
         >
-          <Upload className="w-5 h-5" />
+          <Upload className="w-4 h-4" />
           Click to upload CV (PDF or Word, max 5MB)
         </button>
       ) : (
