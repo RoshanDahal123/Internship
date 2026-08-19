@@ -1,5 +1,5 @@
 import { FileText } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import {
@@ -16,11 +16,8 @@ const Display = () => {
 
   const {searchTerm, isDeleteAllModalOpen}= useAppSelector((state)=>state.form);
 const[deleteError,setDeleteError]=useState("");
-//Replaces: useEffect + dispatch(fetchStart/fetchSuccess/fetchFailure) +
-  // useAppSelector(state => state.form). RTK Query fetches on mount,
-  // tracks loading/error itself, and re-fetches automatically whenever
-  // a mutation below invalidates the "FormEntry" LIST tag.
-
+// Defer the search term state automatically
+const deferredSearchValue=useDeferredValue(searchTerm); 
 const{
   data:entries=[],
   isLoading,
@@ -30,13 +27,13 @@ const{
 const[deleteFormEntry,{isLoading:isDeletingOne}]= useDeleteFormEntryMutation();
 
 const[deleteAllEntries,{isLoading:isDeletingAll}]= useDeleteAllEntriesMutation();
-// Filter entries dynamically based on RTK Query data & Redux search term
+// Filter entries dynamically based on RTK Query data &deferredSearchTerm instead the Redux searchterm for optimization
   const filteredEntries = useMemo(() => {
-    if (!searchTerm.trim()) return entries;
+    if (!deferredSearchValue.trim()) return entries;
     return entries.filter((entry) =>
-      entry.name.toLowerCase().includes(searchTerm.toLowerCase())
+      entry.name.toLowerCase().includes(deferredSearchValue.toLowerCase())
     );
-  }, [entries, searchTerm]);
+  }, [entries, deferredSearchValue]);
 
 
 const handleClearEntry= async(id:number)=>{

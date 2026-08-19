@@ -25,7 +25,7 @@ export const formApi = createApi({
         const multipart = new FormData();
         multipart.append("Name", data.name);
         multipart.append("Email", data.email);
-        multipart.append("Age", Number(data.age));
+        multipart.append("Age", String(data.age));
         multipart.append("Address", data.address);
         multipart.append("Description", data.description);
         multipart.append(
