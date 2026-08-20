@@ -32,10 +32,6 @@ public class RoleController : ControllerBase
         _context.Roles.Add(roleToUpdate);
 
         return Ok("Yes Update");
-
-
-
-
     }
 
 }
