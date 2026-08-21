@@ -4,7 +4,7 @@ export interface Education{
   year:number;
 }
 
-export interface FormValues {
+export interface Student {
   name: string;
   email: string;
   address: string;
@@ -15,7 +15,7 @@ export interface FormValues {
   education:Education[];
 
 }
-export interface FormEntry {
+export interface StudentEntry{
   id: number;
   name: string;
   email: string;
@@ -25,4 +25,16 @@ export interface FormEntry {
   dateOfBirth: string; // ISO string, as the backend returns it
   cvFileUrl: string | null;
   education: Education[];
+}
+
+export type UpdateStudentPayload = Student & {
+  id: number;
+};
+
+export interface PaginatedStudents{
+  items:StudentEntry[],
+  page:number;
+  pageSize:number;
+  totalCount:number;
+  hasNextPage:boolean;
 }

@@ -2,16 +2,18 @@
 
 
 import { BrowserRouter, Route, Routes } from "react-router";
-import Display from "./pages/Display";
-import UserForm from "./pages/UserForm";
+import StudentDetail from "./pages/StudentDetail";
+import StudentForm from "./pages/StudentForm";
+import StudentList from "./pages/StudentList";
 const App = () => {
   return (
     <BrowserRouter>
      
      <Routes>
-      
-      <Route path='/' element={<UserForm/>} />
-      <Route path='/display' element={<Display/>}/>
+      <Route path='/students' element ={<StudentList/>} />
+      <Route path='/students/:id' element={<StudentDetail/>} />
+      <Route path='/students/:id/edit' element={<StudentForm mode="edit"/>}/>
+      <Route path='students/new' element={<StudentForm mode="create"/>}/>
       
     </Routes>
     </BrowserRouter>
