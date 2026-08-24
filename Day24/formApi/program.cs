@@ -1,15 +1,24 @@
+﻿
 
-using formApi.Data;
-using Microsoft.EntityFrameworkCore;
+using formApi.FormApp.Application;
+using formApi.FormApp.Infrastructure.SqlRepo;
+using formApi.FormApp.Infrastructure.Services;
+using FormApp.Application;
+using FormApp.Infrastructure.SqlRepo;
+var builder = WebApplication.CreateBuilder(args);
 
-var builder= WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDBContext>(options=>
- options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+// Each layer registers itself — Program.cs just composes them.
+builder.Services.AddApplication();
+builder.Services.AddSqlRepoInfrastructure(builder.Configuration);
+builder.Services.AddServicesInfrastructure(options =>
+{
+    options.UploadRootPath = Path.Combine(builder.Environment.WebRootPath, "uploads");
+    options.RequestPathPrefix = "/uploads";
+});
 
 // CORS — required or your React dev server (localhost:5173/3000) gets
 // blocked by the browser when calling this API from a different port
@@ -25,7 +34,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -36,6 +44,6 @@ app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-app.UseStaticFiles();// server the uploaded files from the wwwroot folder
+app.UseStaticFiles(); // serves the uploaded files from the wwwroot folder
 
 app.Run();

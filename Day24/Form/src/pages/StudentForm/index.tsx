@@ -1,4 +1,4 @@
-"use client"
+
 
 import {
   Calendar,
@@ -117,6 +117,8 @@ export default function StudentForm({ mode }: StudentFormProps) {
 React.useEffect(() => {
   if (isCreateError || isUpdateError) {
     toast.error(`Failed to ${isEdit ? "update" : "create"} student. Please try again.`)
+  } else{
+    navigate("/students");
   }
 }, [isCreateError, isUpdateError, isEdit])
 
@@ -128,7 +130,6 @@ React.useEffect(() => {
       } else {
        createStudent(data)
       }
-      navigate("/students")
     } catch (err) {
       toast.error(
         `Failed to ${isEdit ? "update" : "create"} student. Please try again.`
@@ -254,6 +255,7 @@ React.useEffect(() => {
                     rules={{
                       required: "Required",
                       valueAsNumber: true,
+                      
                       min: { value: 1, message: "Min 1" },
                       max: { value: 100, message: "Max 100" },
                     }}

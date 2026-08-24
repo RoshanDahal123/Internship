@@ -13,7 +13,6 @@ export interface Student {
   dateOfBirth: Date | null;
   cvFile: File | null;
   education:Education[];
-
 }
 export interface StudentEntry{
   id: number;

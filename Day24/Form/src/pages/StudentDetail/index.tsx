@@ -1,22 +1,24 @@
 "use client"
 
 import {
-   Calendar,
-   FileText,
-   GraduationCap,
-   Mail,
-   MapPin,
-   Pencil,
-   User,
+  ArrowLeft,
+  Calendar,
+  FileText,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Pencil,
+  User,
 } from "lucide-react"
-import { useNavigate, useParams } from "react-router"
+import { Link, useNavigate, useParams } from "react-router"
 
 import { Button } from "../../components/ui/button"
 import {
-   Card,
-   CardContent,
-   CardHeader,
-   CardTitle,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "../../components/ui/card"
 import { Separator } from "../../components/ui/separator"
 import { Skeleton } from "../../components/ui/skeleton"
@@ -125,6 +127,19 @@ export default function StudentDetails() {
             <DetailItem icon={Calendar} label="Date of Birth" value={dob} />
           </div>
 
+          {student.cvFileUrl && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <Link
+                to={student.cvFileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <FileText className="w-4 h-4" /> View CV
+              </Link>
+            </div>
+          )}
+
           <Separator />
 
           <div className="space-y-1">
@@ -169,6 +184,18 @@ export default function StudentDetails() {
             </div>
           </div>
         </CardContent>
+
+        {/* Added Card Footer for See All List Button at the bottom */}
+        <CardFooter className="flex justify-start pt-4 border-t">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => navigate("/students")}
+          >
+            <ArrowLeft className="size-4" />
+            See All Students
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   )

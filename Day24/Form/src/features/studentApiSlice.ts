@@ -38,7 +38,7 @@ export const studentApi = createApi({
    //genrally infinite query normally means page1->page2(getsadded), so the client has multiple pages added
    //so the traditionally pagination is usually [previous]page1[next] on click on next [previous]page2[next] so to display one page at a time we use this
     getStudents:builder.query<PaginatedStudents,number>({
-      query:(page) => `/students?page=${page}&pageSize=2`,
+      query:(page) => `/students?page=${page}&pageSize=10`,
         providesTags: (result) =>
     result
       ? [
@@ -102,7 +102,7 @@ export const studentApi = createApi({
           multipart.append("CvFile", data.cvFile);
         }
 
-        return { url: `/students/${id}`, method: "PUT", body: multipart };
+        return { url: `/students/${id}`, method: "PATCH", body: multipart };
       },
       invalidatesTags: (result, error, { id }) => [
         { type: "StudentEntry", id },
@@ -136,7 +136,7 @@ export const studentApi = createApi({
 export const {
   useCreateStudentMutation,
   // useGetStudentsInfiniteQuery,
-  useGetStudentsQuery,
+ useGetStudentsQuery,
   useGetStudentByIdQuery,
   useUpdateStudentMutation,
   useDeleteStudentEntryMutation,
