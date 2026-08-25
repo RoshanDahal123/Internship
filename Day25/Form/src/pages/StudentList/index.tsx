@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Eye, Loader2, Pencil, Trash2, UserPlus } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -38,23 +39,90 @@ import {
 } from "../../components/ui/tooltip";
 import {
   useDeleteStudentEntryMutation,
-  useGetStudentsQuery,
+  useGetStudentsInfiniteQuery,
 } from "../../features/studentApiSlice";
+
+const PAGE_SIZE = 10;
+// Safety cap on how many sequential page-fetches we'll chain through when
+// jumping to a page we haven't cached yet (e.g. someone lands on ?page=8
+// directly, or clicks a page number far past what's loaded).
+const MAX_CHAINED_FETCHES = 50;
 
 export default function StudentList() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const page = Number(searchParams.get("page") ?? "1");
-  const pageSize = 10;
+  const urlPage = Number(searchParams.get("page") ?? "1");
 
   const [deleteStudentEntry, { isLoading: isDeleting }] =
     useDeleteStudentEntryMutation();
 
-  const { data, isLoading: isFetching, isError } = useGetStudentsQuery(page);
+  // useGetStudentsInfiniteQuery() has no query arg (QueryArg is `void` in
+  // the endpoint definition) — pagination is driven entirely through
+  // fetchNextPage()/fetchPreviousPage() and the pageParam (page number).
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+  } = useGetStudentsInfiniteQuery();
 
-  const totalCount = data?.totalCount ?? 0;
-  const items = data?.items ?? [];
+  // pageIndex is zero-based and indexes straight into data.pages[pageIndex].
+  // RTK Query's infinite query keeps every page it has fetched, in order, in
+  // that array — moving to an already-cached page is just re-pointing this
+  // index, no network call. Moving to a page we haven't fetched yet chains
+  // fetchNextPage() calls until we reach it (see the effect below).
+  const [pageIndex, setPageIndex] = useState(Math.max(urlPage - 1, 0));
+
+  // Keep pageIndex in sync whenever the URL's page changes (pagination
+  // clicks, typing a URL, or browser back/forward).
+  useEffect(() => {
+    setPageIndex(Math.max(urlPage - 1, 0));
+  }, [urlPage]);
+
+  // Whenever the target pageIndex isn't cached yet, chain fetchNextPage()
+  // calls forward until we reach it (or run out of pages). This is the
+  // trade-off of infinite-query-style pagination: you can't jump straight
+  // to an arbitrary page, you fetch your way there page by page.
+  useEffect(() => {
+    let cancelled = false;
+
+    const ensurePageLoaded = async () => {
+      let cachedCount = data?.pages.length ?? 0;
+      let canFetchMore = hasNextPage;
+      let attempts = 0;
+
+      while (
+        !cancelled &&
+        cachedCount <= pageIndex &&
+        canFetchMore &&
+        attempts < MAX_CHAINED_FETCHES
+      ) {
+        const result = await fetchNextPage();
+        const newCachedCount = result.data?.pages.length ?? cachedCount;
+        canFetchMore = result.hasNextPage ?? false;
+        if (newCachedCount === cachedCount && !canFetchMore) break;
+        cachedCount = newCachedCount;
+        attempts += 1;
+      }
+    };
+
+    ensurePageLoaded();
+    return () => {
+      cancelled = true;
+    };
+    // Deliberately only re-runs when the target page changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageIndex]);
+
+  const currentPage = data?.pages[pageIndex];
+  const items = currentPage?.items ?? [];
+  const totalCount = currentPage?.totalCount ?? 0;
+
+  // Still "loading" if the very first request hasn't resolved, or if the
+  // page the user asked for isn't in the cache yet.
+  const isFetching = isLoading || (!currentPage && !isError);
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({ page: newPage.toString() });
@@ -70,8 +138,8 @@ export default function StudentList() {
   };
 
   // Calculate scope numbers for footer metadata
-  const startRange = totalCount === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endRange = Math.min(page * pageSize, totalCount);
+  const startRange = totalCount === 0 ? 0 : pageIndex * PAGE_SIZE + 1;
+  const endRange = Math.min((pageIndex + 1) * PAGE_SIZE, totalCount);
 
   return (
     <TooltipProvider>
@@ -160,7 +228,7 @@ export default function StudentList() {
                         <div className="flex items-center justify-end gap-1">
                           {/* View Action */}
                           <Tooltip>
-                            <TooltipTrigger >
+                            <TooltipTrigger>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -176,11 +244,11 @@ export default function StudentList() {
 
                           {/* Edit Action */}
                           <Tooltip>
-                            <TooltipTrigger >
+                            <TooltipTrigger>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-green-400 hover:text-foreground"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 onClick={() => navigate(`/students/${student.id}/edit`)}
                               >
                                 <Pencil className="h-4 w-4" />
@@ -193,13 +261,12 @@ export default function StudentList() {
                           {/* Delete Modal */}
                           <AlertDialog>
                             <Tooltip>
-                              <TooltipTrigger >
-                                <AlertDialogTrigger >
+                              <TooltipTrigger>
+                                <AlertDialogTrigger>
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8  
-                                     text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                   >
                                     <Trash2 className="h-4 w-4" />
                                     <span className="sr-only">Delete</span>
@@ -256,8 +323,8 @@ export default function StudentList() {
                 <span className="font-medium text-foreground">{totalCount}</span> results
               </p>
               <StudentPagination
-                page={page}
-                pageSize={pageSize}
+                page={pageIndex + 1}
+                pageSize={PAGE_SIZE}
                 totalCount={totalCount}
                 onPageChange={handlePageChange}
               />

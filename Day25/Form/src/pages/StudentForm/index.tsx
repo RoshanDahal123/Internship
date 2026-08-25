@@ -74,9 +74,9 @@ export default function StudentForm({ mode }: StudentFormProps) {
     skip: !isEdit || !id,
   })
 
-  const [createStudent, { isLoading: isCreating,isSuccess:isCreateSuccess, isError:isCreateError }] =
+  const [createStudent, { isLoading: isCreating, isError:isCreateError }] =
     useCreateStudentMutation()
-  const [updateStudent, { isLoading: isUpdating,isSuccess:isUpdateSuccess, isError:isUpdateError }] =
+  const [updateStudent, { isLoading: isUpdating, isError:isUpdateError }] =
     useUpdateStudentMutation()
   const isSubmitting = isCreating || isUpdating;
 
@@ -114,20 +114,14 @@ export default function StudentForm({ mode }: StudentFormProps) {
 
 
   //Surface failures
-// Handle success redirection
-React.useEffect(() => {
-  if (isCreateSuccess || isUpdateSuccess) {
-    toast.success(`Student ${isEdit ? "updated" : "created"} successfully.`);
-    navigate("/");
-  }
-}, [isCreateSuccess, isUpdateSuccess, isEdit, navigate]);
-
-// Handle error messages
 React.useEffect(() => {
   if (isCreateError || isUpdateError) {
-    toast.error(`Failed to ${isEdit ? "update" : "create"} student. Please try again.`);
+    toast.error(`Failed to ${isEdit ? "update" : "create"} student. Please try again.`)
+  } else{
+    navigate("/students");
   }
-}, [isCreateError, isUpdateError, isEdit]);
+}, [isCreateError, isUpdateError, isEdit])
+
 
    function onSubmit(data: Student) {
     try {
