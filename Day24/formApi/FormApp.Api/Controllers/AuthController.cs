@@ -1,8 +1,9 @@
 ﻿using formApi.FormApp.Application.DTOs.Auth;
 using formApi.FormApp.Application.Exceptions;
 using formApi.FormApp.Application.Interfaces;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace formApi.FormApp.Api.Controllers
 {
@@ -17,6 +18,8 @@ namespace formApi.FormApp.Api.Controllers
             _authService = authService;
         }
 
+       
+
         [HttpPost("register")]
 
         public async Task<IActionResult> Register([FromBody] RegisterAdminDto dto)
@@ -24,7 +27,9 @@ namespace formApi.FormApp.Api.Controllers
             try
             {
                 var result = await _authService.RegisterAsync(dto);
-                return Ok(result);
+                if (result is null) return Unauthorized();
+                SetAuthCookies(result);
+                return Ok(new { email = result.Email, role = result.Role });
             }
             catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
             catch (AppValidationException ex) { return BadRequest(new { message = ex.Message }); }
@@ -38,7 +43,11 @@ namespace formApi.FormApp.Api.Controllers
             try
             {
                 var result = await _authService.LoginAsync(dto);
-                return Ok(result);
+
+                SetAuthCookies(result);
+
+                // Return non-sensitive info only — don't put tokens in the body anymore
+                return Ok(new { email = result.Email, role = result.Role });
             }
             catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
             catch (AppValidationException ex)
@@ -49,25 +58,94 @@ namespace formApi.FormApp.Api.Controllers
 
         [HttpPost("refresh")]
 
-        public async Task<IActionResult> Refresh(RefreshRequestDto dto)
+        public async Task<IActionResult> Refresh()
         {
+            
+                var refreshToken = Request.Cookies["refreshToken"];
+                if (string.IsNullOrEmpty(refreshToken))
+                    return Unauthorized(new { message = "No refresh token." });
+
             try
             {
-                var result = await _authService.RefreshAsync(dto.RefreshToken);
-                return Ok(result);
+                var result = await _authService.RefreshAsync(refreshToken);
+                SetAuthCookies(result);
+                return Ok(new { email = result.Email, role = result.Role });
             }
-            catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
+            catch (AuthException ex) {
+                ClearAuthCookies();
+                return Unauthorized(new { message = ex.Message }); 
+            }
+            catch (AppValidationException ex) { return Unauthorized(new { message = ex.Message }); }
+            
+            
 
         }
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout(RefreshRequestDto dto)
+        public async Task<IActionResult> Logout()
         {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized(new { message = "No refresh token." });
             try
             {
-                await _authService.LogoutAsync(dto.RefreshToken);
+                await _authService.LogoutAsync(refreshToken);
+                ClearAuthCookies();
                 return NoContent();
+                
             }
             catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
+        }
+
+
+        [HttpGet("me")]
+        [Authorize]
+        public IActionResult Me()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var role = User.FindFirstValue(ClaimTypes.Role);
+
+            if (email is null)
+                return Unauthorized();
+
+            return Ok(new { email, role });
+        }
+        private void SetAuthCookies(AuthResultDto result)
+        {
+            Response.Cookies.Append("accessToken", result.AccessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,          // requires HTTPS — fine for you since Kestrel dev cert is https
+                SameSite = SameSiteMode.Strict, // or Lax if frontend/backend are on different subdomains
+                Expires = result.AccessTokenExpiresAt
+            });
+
+            Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = result.RefreshTokenExpiresAt,
+                Path = "/api/auth/refresh" // optional: restrict refresh token cookie to only be sent to this route
+            });
+        }
+
+        private void ClearAuthCookies()
+        {
+            Response.Cookies.Delete("accessToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = "/" // match whatever path accessToken was set with (default "/")
+            });
+
+            Response.Cookies.Delete("refreshToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = "/api/auth/refresh" // MUST match the Path used in SetAuthCookies
+            });
         }
 
     }
