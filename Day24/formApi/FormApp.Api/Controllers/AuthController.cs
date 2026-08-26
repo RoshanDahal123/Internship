@@ -29,7 +29,13 @@ namespace formApi.FormApp.Api.Controllers
                 var result = await _authService.RegisterAsync(dto);
                 if (result is null) return Unauthorized();
                 SetAuthCookies(result);
-                return Ok(new { email = result.Email, role = result.Role });
+                return Ok(new AuthResponseDto
+                {
+                    AccessToken= result.AccessToken,
+                    Role= result.Role,
+                    Email = result.Email,
+                    AccessTokenExpiresAt = result.AccessTokenExpiresAt// ISO 8601 format
+                });
             }
             catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
             catch (AppValidationException ex) { return BadRequest(new { message = ex.Message }); }
@@ -47,7 +53,13 @@ namespace formApi.FormApp.Api.Controllers
                 SetAuthCookies(result);
 
                 // Return non-sensitive info only — don't put tokens in the body anymore
-                return Ok(new { email = result.Email, role = result.Role });
+                return Ok(new AuthResponseDto
+                {
+                    AccessToken = result.AccessToken,
+                    Role = result.Role,
+                    Email = result.Email,
+                    AccessTokenExpiresAt = result.AccessTokenExpiresAt// ISO 8601 format
+                });
             }
             catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
             catch (AppValidationException ex)
@@ -69,7 +81,13 @@ namespace formApi.FormApp.Api.Controllers
             {
                 var result = await _authService.RefreshAsync(refreshToken);
                 SetAuthCookies(result);
-                return Ok(new { email = result.Email, role = result.Role });
+                return Ok(new AuthResponseDto
+                {
+                    AccessToken = result.AccessToken,
+                    Role = result.Role,
+                    Email = result.Email,
+                    AccessTokenExpiresAt = result.AccessTokenExpiresAt// ISO 8601 format
+                });
             }
             catch (AuthException ex) {
                 ClearAuthCookies();
