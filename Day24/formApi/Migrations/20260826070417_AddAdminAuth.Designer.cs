@@ -9,11 +9,11 @@ using formApi.FormApp.Infrastructure.SqlRepo.Persistence;
 
 #nullable disable
 
-namespace formApi.FormApp.Infrastructure.SqlRepo.Migrations
+namespace formApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260824053146_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260826070417_AddAdminAuth")]
+    partial class AddAdminAuth
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,34 @@ namespace formApi.FormApp.Infrastructure.SqlRepo.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("formApi.FormApp.Domain.Entities.AdminUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminUsers");
+                });
 
             modelBuilder.Entity("formApi.FormApp.Domain.Entities.Education", b =>
                 {
@@ -52,6 +80,40 @@ namespace formApi.FormApp.Infrastructure.SqlRepo.Migrations
                     b.HasIndex("UserEntryId");
 
                     b.ToTable("Educations");
+                });
+
+            modelBuilder.Entity("formApi.FormApp.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AdminUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminUserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("formApi.FormApp.Domain.Entities.UserEntry", b =>
@@ -101,6 +163,22 @@ namespace formApi.FormApp.Infrastructure.SqlRepo.Migrations
                         .IsRequired();
 
                     b.Navigation("UserEntry");
+                });
+
+            modelBuilder.Entity("formApi.FormApp.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("formApi.FormApp.Domain.Entities.AdminUser", "AdminUser")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
+                });
+
+            modelBuilder.Entity("formApi.FormApp.Domain.Entities.AdminUser", b =>
+                {
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("formApi.FormApp.Domain.Entities.UserEntry", b =>

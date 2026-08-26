@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace formApi.FormApp.Infrastructure.SqlRepo.Migrations
+namespace formApi.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

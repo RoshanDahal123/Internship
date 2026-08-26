@@ -4,11 +4,13 @@ using formApi.FormApp.Application.Exceptions;
 using formApi.FormApp.Application.Interfaces;
 using formApi.FormApp.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace formApi.FormApp.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+
 public class StudentsController : ControllerBase
 {
     private readonly IFormEntryService _formEntryService;
@@ -19,6 +21,7 @@ public class StudentsController : ControllerBase
     }
 
     private string BaseUrl => $"{Request.Scheme}://{Request.Host}";
+
 
     [HttpGet]
     public async Task<ActionResult<PagedResult<FormEntryDto>>> GetAll([FromQuery] PaginationParams pagination)
@@ -36,7 +39,7 @@ public class StudentsController : ControllerBase
 
         return Ok(entry);
     }
-
+    [Authorize(Roles ="Admin")]
     [HttpPost]
     [Consumes("multipart/form-data")] // tells swagger/clients this endpoint expects a file, not raw json
     public async Task<ActionResult<FormEntryDto>> Create([FromForm] CreateFormEntryFormData form)
@@ -71,7 +74,7 @@ public class StudentsController : ControllerBase
         }
     }
 
-
+    [Authorize(Roles = "Admin")]
     [HttpPatch("{id:int}")]
     [Consumes("multipart/form-data")] // tells swagger/clients this endpoint expects a file, not raw json
     public async Task<ActionResult<FormEntryDto>> Update([FromForm] UpdateFormEntryDto form, int id)
@@ -101,7 +104,7 @@ public class StudentsController : ControllerBase
     }
 
 
-
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -111,7 +114,7 @@ public class StudentsController : ControllerBase
 
         return NoContent();
     }
-
+    [Authorize(Roles = "Admin")]
     [HttpDelete("all")]
     public async Task<IActionResult> DeleteAll()
     {

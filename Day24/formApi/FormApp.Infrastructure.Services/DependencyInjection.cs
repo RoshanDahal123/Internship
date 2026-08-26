@@ -10,6 +10,9 @@ public static class DependencyInjection
     {
         services.Configure(configureOptions);
         services.AddScoped<IFileStorageService, FileStorageService>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+      
         return services;
     }
 }
