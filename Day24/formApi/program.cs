@@ -13,7 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Form API", Version = "v1" });
+});
+    
+ 
 // Each layer registers itself — Program.cs just composes them.
 builder.Services.AddApplication();
 builder.Services.AddSqlRepoInfrastructure(builder.Configuration);
