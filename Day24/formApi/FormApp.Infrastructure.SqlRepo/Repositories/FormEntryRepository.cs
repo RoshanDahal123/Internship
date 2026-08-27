@@ -16,12 +16,22 @@ namespace formApi.FormApp.Infrastructure.SqlRepo.Repositories
             _context = context;
         }
 
-        public Task<PagedResult<UserEntry>> GetPagedAsync(int page, int pageSize)
+        public Task<PagedResult<UserEntry>> GetPagedAsync(int page, int pageSize,string? search)
         {
-            return _context.UserEntries
-                .Include(u => u.Education)
-                .OrderBy(u => u.Id)
-                .ToPagedResultAsync(page, pageSize);
+            var query = _context.UserEntries
+            .Include(u => u.Education)
+             .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim().ToLower();
+                query = query.Where(u =>
+                    u.Name.ToLower().Contains(term) ||
+                    u.Email.ToLower().Contains(term));
+            }
+            return query
+          .OrderBy(u => u.Id)
+          .ToPagedResultAsync(page, pageSize);
         }
 
         public Task<UserEntry?> GetByIdAsync(int id)

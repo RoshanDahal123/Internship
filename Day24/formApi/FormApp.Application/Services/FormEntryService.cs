@@ -23,7 +23,7 @@ public class FormEntryService : IFormEntryService
 
     public async Task<PagedResult<FormEntryDto>> GetAllAsync(PaginationParams pagination, string baseUrl)
     {
-        var pagedEntities = await _repository.GetPagedAsync(pagination.Page, pagination.PageSize);
+        var pagedEntities = await _repository.GetPagedAsync(pagination.Page, pagination.PageSize,pagination.Search);
 
         return new PagedResult<FormEntryDto>
         {

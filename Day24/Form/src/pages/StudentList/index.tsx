@@ -1,6 +1,6 @@
 // src/pages/StudentList/index.tsx
-import { Eye, Loader2, Pencil, Trash2, UserPlus } from "lucide-react";
-import { useMemo } from "react";
+import { Eye, Loader2, Pencil, Search, Trash2, UserPlus } from "lucide-react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { StudentPagination } from "../../components/student-pagination";
@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
 import { Skeleton } from "../../components/ui/skeleton";
 import {
   Table,
@@ -44,40 +45,57 @@ import {
   useGetStudentsQuery,
 } from "../../features/studentApiSlice";
 import { useAppSelector } from "../../hooks/reducer-hook";
+import { useDebouncedCallback } from "../../hooks/use-debounced-callback";
 
 export default function StudentList() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const isAdmin = useAppSelector(selectIsAdmin);
-  const searchTerm = useAppSelector((state) => state.form.searchTerm);
 
   const page = Number(searchParams.get("page") ?? "1");
+  const urlSearch = searchParams.get("search") ?? "";
   const pageSize = 10;
+
+  // Local input state so typing feels instant; the URL (and thus the
+  // actual query) updates on a debounce so we don't spam the API on
+  // every keystroke.
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  const debouncedUpdateUrl = useDebouncedCallback((value: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value.trim()) {
+        next.set("search", value.trim());
+      } else {
+        next.delete("search");
+      }
+      next.set("page", "1"); // new search -> always restart at page 1
+      return next;
+    });
+  }, 300);
+
+  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setSearchInput(e.target.value);
+    debouncedUpdateUrl(e.target.value);
+  }
 
   const [deleteStudentEntry, { isLoading: isDeleting }] =
     useDeleteStudentEntryMutation();
-  const { data, isLoading: isFetching, isError } = useGetStudentsQuery(page);
+  const { data, isLoading: isFetching, isError } = useGetStudentsQuery({
+    page,
+    search: urlSearch,
+  });
 
   const totalCount = data?.totalCount ?? 0;
   const items = data?.items ?? [];
 
-  // NOTE: this filters only the currently-loaded page (server pagination
-  // still controls totalCount/hasNextPage). Once the backend accepts a
-  // ?search= query param, replace this with a search arg on
-  // useGetStudentsQuery so filtering happens server-side across all pages.
-  const filteredItems = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
-    if (!query) return items;
-    return items.filter(
-      (s) =>
-        s.name.toLowerCase().includes(query) ||
-        s.email.toLowerCase().includes(query),
-    );
-  }, [items, searchTerm]);
-
   const handlePageChange = (newPage: number) => {
-    setSearchParams({ page: newPage.toString() });
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", newPage.toString());
+      return next;
+    });
   };
 
   const handleDelete = async (id: number) => {
@@ -113,14 +131,24 @@ export default function StudentList() {
         </div>
 
         <Card className="shadow-xs border-border/60">
-          <CardHeader className="p-4 sm:p-6 pb-4 flex-row items-center justify-between border-b border-border/40 space-y-0">
+          <CardHeader className="p-4 sm:p-6 pb-4 flex flex-col gap-4 border-b border-border/40 sm:flex-row sm:items-center sm:justify-between space-y-0">
             <div>
               <CardTitle className="text-base font-medium">Directory</CardTitle>
               <CardDescription className="text-xs">
                 {totalCount > 0
-                  ? `${filteredItems.length} of ${totalCount} registered students`
+                  ? `${totalCount} registered student${totalCount === 1 ? "" : "s"}`
                   : "No data available"}
               </CardDescription>
+            </div>
+            <div className="relative w-full sm:max-w-xs">
+              <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchInput}
+                onChange={handleSearchChange}
+                placeholder="Search students..."
+                className="h-9 pl-8"
+                aria-label="Search students"
+              />
             </div>
           </CardHeader>
 
@@ -147,9 +175,11 @@ export default function StudentList() {
             {!isFetching && !isError && items.length === 0 && (
               <div className="text-center py-12 px-4 space-y-3">
                 <p className="text-sm font-medium text-muted-foreground">
-                  No students found
+                  {urlSearch
+                    ? `No students match "${urlSearch}"`
+                    : "No students found"}
                 </p>
-                {isAdmin && (
+                {isAdmin && !urlSearch && (
                   <p className="text-xs text-muted-foreground/80 max-w-sm mx-auto">
                     Get started by creating a new student record using the
                     button above.
@@ -158,22 +188,7 @@ export default function StudentList() {
               </div>
             )}
 
-            {!isFetching &&
-              !isError &&
-              items.length > 0 &&
-              filteredItems.length === 0 && (
-                <div className="text-center py-12 px-4 space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    No students match "{searchTerm}"
-                  </p>
-                  <p className="text-xs text-muted-foreground/80">
-                    Try a different name or email — search only covers this
-                    page.
-                  </p>
-                </div>
-              )}
-
-            {!isFetching && !isError && filteredItems.length > 0 && (
+            {!isFetching && !isError && items.length > 0 && (
               <Table>
                 <TableHeader className="bg-muted/40">
                   <TableRow className="hover:bg-transparent">
@@ -185,7 +200,7 @@ export default function StudentList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredItems.map((student) => (
+                  {items.map((student) => (
                     <TableRow
                       key={student.id}
                       className="transition-colors hover:bg-muted/30"
@@ -198,7 +213,6 @@ export default function StudentList() {
                       </TableCell>
                       <TableCell className="text-right py-3 pr-4">
                         <div className="flex items-center justify-end gap-1">
-                          {/* View Details Action */}
                           <Tooltip>
                             <TooltipTrigger
                               render={
@@ -218,10 +232,8 @@ export default function StudentList() {
                             <TooltipContent>View details</TooltipContent>
                           </Tooltip>
 
-                          {/* Admin-only actions */}
                           {isAdmin && (
                             <>
-                              {/* Edit Action */}
                               <Tooltip>
                                 <TooltipTrigger
                                   render={
@@ -241,7 +253,6 @@ export default function StudentList() {
                                 <TooltipContent>Edit record</TooltipContent>
                               </Tooltip>
 
-                              {/* Delete Action */}
                               <AlertDialog>
                                 <Tooltip>
                                   <TooltipTrigger
@@ -286,7 +297,7 @@ export default function StudentList() {
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       variant="destructive"
-                                      onClick={(e:any) => {
+                                      onClick={(e: any) => {
                                         e.preventDefault();
                                         handleDelete(student.id);
                                       }}
@@ -315,15 +326,11 @@ export default function StudentList() {
             <div className="p-4 border-t border-border/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <p className="text-xs text-muted-foreground text-center sm:text-left">
                 Showing{" "}
-                <span className="font-medium text-foreground">
-                  {startRange}
-                </span>{" "}
+                <span className="font-medium text-foreground">{startRange}</span>{" "}
                 to{" "}
                 <span className="font-medium text-foreground">{endRange}</span>{" "}
                 of{" "}
-                <span className="font-medium text-foreground">
-                  {totalCount}
-                </span>{" "}
+                <span className="font-medium text-foreground">{totalCount}</span>{" "}
                 results
               </p>
               <StudentPagination

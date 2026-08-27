@@ -1,4 +1,4 @@
-import { createApi} from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import type {
   PaginatedStudents,
   Student,
@@ -34,18 +34,31 @@ export const studentApi = createApi({
     //       : [{ type: "StudentEntry", id: "LIST" }],
     // }),
 
-   //genrally infinite query normally means page1->page2(getsadded), so the client has multiple pages added
-   //so the traditionally pagination is usually [previous]page1[next] on click on next [previous]page2[next] so to display one page at a time we use this
-    getStudents:builder.query<PaginatedStudents,number>({
-      query:(page) => `/students?page=${page}&pageSize=10`,
-        providesTags: (result) =>
-    result
-      ? [
-          ...result.items.map((s) => ({ type: "StudentEntry" as const, id: s.id })),
-          { type: "StudentEntry", id: "LIST" },
-        ]
-      : [{ type: "StudentEntry", id: "LIST" }],
-}),
+    //genrally infinite query normally means page1->page2(getsadded), so the client has multiple pages added
+    //so the traditionally pagination is usually [previous]page1[next] on click on next [previous]page2[next] so to display one page at a time we use this
+    getStudents: builder.query<
+      PaginatedStudents,
+      { page: number; search?: string }
+    >({
+      query: ({ page, search }) => {
+        const params = new URLSearchParams({
+          page: String(page),
+          pageSize: "10",
+        });
+        if (search?.trim()) params.set("search", search.trim());
+        return `/students?${params.toString()}`;
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.items.map((s) => ({
+                type: "StudentEntry" as const,
+                id: s.id,
+              })),
+              { type: "StudentEntry", id: "LIST" },
+            ]
+          : [{ type: "StudentEntry", id: "LIST" }],
+    }),
 
     getStudentById: builder.query<StudentEntry, number>({
       query: (id) => `/students/${id}`,
@@ -80,7 +93,6 @@ export const studentApi = createApi({
       invalidatesTags: [{ type: "StudentEntry", id: "LIST" }],
     }),
 
-
     updateStudent: builder.mutation<
       StudentEntry,
       { id: number; data: Student }
@@ -109,7 +121,6 @@ export const studentApi = createApi({
       ],
     }),
 
-    
     deleteStudentEntry: builder.mutation<void, number>({
       query: (id) => ({
         url: `/students/${id}`,
@@ -120,7 +131,6 @@ export const studentApi = createApi({
         { type: "StudentEntry", id: "LIST" },
       ],
     }),
-
 
     deleteAllEntries: builder.mutation<{ message: string }, void>({
       query: () => ({
@@ -135,7 +145,7 @@ export const studentApi = createApi({
 export const {
   useCreateStudentMutation,
   // useGetStudentsInfiniteQuery,
- useGetStudentsQuery,
+  useGetStudentsQuery,
   useGetStudentByIdQuery,
   useUpdateStudentMutation,
   useDeleteStudentEntryMutation,

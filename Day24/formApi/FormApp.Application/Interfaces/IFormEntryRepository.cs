@@ -6,7 +6,7 @@ namespace formApi.FormApp.Application.Interfaces
 {
     public interface IFormEntryRepository
     {
-        Task<PagedResult<UserEntry>> GetPagedAsync(int page, int pageSize);
+        Task<PagedResult<UserEntry>> GetPagedAsync(int page, int pageSize, string? search);
         Task<UserEntry?> GetByIdAsync(int id);
         Task AddAsync(UserEntry entity);
         Task UpdateAsync(UserEntry entity);
