@@ -1,15 +1,14 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi} from "@reduxjs/toolkit/query/react";
 import type {
   PaginatedStudents,
   Student,
   StudentEntry,
 } from "../types/formTypes";
+import { baseQueryWithReauth } from "../lib/base-query-with-reauth";
 
 export const studentApi = createApi({
   reducerPath: "studentApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE_URL,
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["StudentEntry"],
   endpoints: (builder) => ({
     // getStudents: builder.infiniteQuery<PaginatedStudents, void, number>({

@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { UserRole } from "../types/authTypes";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AuthResponse, UserRole } from "../types/authTypes";
 
 
 interface AuthState {
@@ -7,20 +7,42 @@ interface AuthState {
   role: UserRole | null;
   accessToken: string | null;
   accessTokenExpiresAt: string | null;
-  refreshToken: string | null;
-  refreshTokenExpiresAt: string | null;
 }
 
-const emptyAuthState: AuthState = {
+const initialState: AuthState = {
   email: null,
   role: null,
   accessToken: null,
   accessTokenExpiresAt: null,
-  refreshToken: null,
-  refreshTokenExpiresAt: null,
 };
 
 
 const authSlice= createSlice({
-    
+ name: "auth",
+  initialState,
+  reducers: {
+    setCredentials: (state, action: PayloadAction<AuthResponse>) => {
+      state.email = action.payload.email;
+      state.role = action.payload.role;
+      state.accessToken = action.payload.accessToken;
+      state.accessTokenExpiresAt = action.payload.accessTokenExpiresAt;
+    },
+    clearCredentials: (state) => {
+      state.email = null;
+      state.role = null;
+      state.accessToken = null;
+      state.accessTokenExpiresAt = null;
+    },
+  },
 })
+
+export const {setCredentials, clearCredentials}= authSlice.actions;
+
+export default authSlice.reducer;
+
+
+export const selectIsAuthenticated=(state:{auth:AuthState})=> !! state.auth.accessToken;
+export const selectIsAdmin= (state:{auth:AuthState})=>state.auth.role==="Admin";
+export const selectAuthEmail=(state:{auth:AuthState})=>state.auth.email;
+export const selectAccessTokenExpiresAt = (state: { auth: AuthState }) =>
+  state.auth.accessTokenExpiresAt;

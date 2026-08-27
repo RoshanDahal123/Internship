@@ -4,9 +4,7 @@ export type UserRole = "Admin";
 /** Shape returned by /auth/register, /auth/login, and /auth/refresh — identical on all three. */
 export interface AuthResponse {
   accessToken: string;
-  accessTokenExpiresAt: string; // ISO string
-  refreshToken: string;
-  refreshTokenExpiresAt: string; // ISO string
+  accessTokenExpiresAt: string; // ISO string string
   email: string;
   role: UserRole;
 }
@@ -24,6 +22,3 @@ export interface RegisterRequest {
   setupKey: string;
 }
 
-export interface RefreshRequest {
-  refreshToken: string;
-}

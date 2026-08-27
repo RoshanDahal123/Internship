@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   ArrowLeft,
@@ -9,32 +9,34 @@ import {
   MapPin,
   Pencil,
   User,
-} from "lucide-react"
-import { Link, useNavigate, useParams } from "react-router"
+} from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router";
 
-import { Button } from "../../components/ui/button"
+import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card"
-import { Separator } from "../../components/ui/separator"
-import { Skeleton } from "../../components/ui/skeleton"
-import { useGetStudentByIdQuery } from "../../features/studentApiSlice"
-import DetailItem from "../../components/detail-item"
-
+} from "../../components/ui/card";
+import { Separator } from "../../components/ui/separator";
+import { Skeleton } from "../../components/ui/skeleton";
+import { useGetStudentByIdQuery } from "../../features/studentApiSlice";
+import DetailItem from "../../components/detail-item";
+import { useAppSelector } from "../../hooks/reducer-hook";
+import { selectIsAdmin } from "../../features/authSlice";
 
 export default function StudentDetails() {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>();
+  const isAdmin = useAppSelector(selectIsAdmin);
+  const navigate = useNavigate();
 
   const {
     data: student,
     isLoading,
     isError,
-  } = useGetStudentByIdQuery(Number(id))
+  } = useGetStudentByIdQuery(Number(id));
 
   if (isLoading) {
     return (
@@ -50,7 +52,7 @@ export default function StudentDetails() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   if (isError || !student) {
@@ -67,7 +69,7 @@ export default function StudentDetails() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   const dob = student.dateOfBirth
@@ -76,7 +78,7 @@ export default function StudentDetails() {
         month: "long",
         day: "numeric",
       })
-    : ""
+    : "";
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4">
@@ -89,21 +91,27 @@ export default function StudentDetails() {
                 {student.name}
               </CardTitle>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/students/${id}/edit`)}
-            >
-              <Pencil className="size-4" />
-              Edit
-            </Button>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/students/${id}/edit`)}
+              >
+                <Pencil className="size-4" />
+                Edit
+              </Button>
+            )}
           </div>
         </CardHeader>
 
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <DetailItem icon={Mail} label="Email" value={student.email} />
-            <DetailItem icon={Calendar} label="Age" value={String(student.age)} />
+            <DetailItem
+              icon={Calendar}
+              label="Age"
+              value={String(student.age)}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -182,5 +190,5 @@ export default function StudentDetails() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
