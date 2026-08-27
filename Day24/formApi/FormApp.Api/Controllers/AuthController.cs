@@ -133,7 +133,7 @@ namespace formApi.FormApp.Api.Controllers
             {
                 HttpOnly = true,
                 Secure = true,          // requires HTTPS — fine for you since Kestrel dev cert is https
-                SameSite = SameSiteMode.Strict, // or Lax if frontend/backend are on different subdomains
+                SameSite = SameSiteMode.None, // or Lax if frontend/backend are on different subdomains
                 Expires = result.AccessTokenExpiresAt
             });
 
@@ -141,7 +141,7 @@ namespace formApi.FormApp.Api.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = result.RefreshTokenExpiresAt,
                 Path = "/api/auth/refresh" // optional: restrict refresh token cookie to only be sent to this route
             });
@@ -153,7 +153,7 @@ namespace formApi.FormApp.Api.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Path = "/" // match whatever path accessToken was set with (default "/")
             });
 
@@ -161,7 +161,7 @@ namespace formApi.FormApp.Api.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Path = "/api/auth/refresh" // MUST match the Path used in SetAuthCookies
             });
         }
