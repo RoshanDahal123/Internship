@@ -84,8 +84,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 app.UseStaticFiles(); // serves the uploaded files from the wwwroot folder
+app.MapControllers();
 
 app.Run();
