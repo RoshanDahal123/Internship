@@ -143,7 +143,7 @@ namespace formApi.FormApp.Api.Controllers
                 Secure = true,
                 SameSite = SameSiteMode.None,
                 Expires = result.RefreshTokenExpiresAt,
-                Path = "/api/auth/refresh" // optional: restrict refresh token cookie to only be sent to this route
+                Path = "/api/auth" // optional: restrict refresh token cookie to only be sent to this route
             });
         }
 
@@ -162,7 +162,7 @@ namespace formApi.FormApp.Api.Controllers
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
-                Path = "/api/auth/refresh" // MUST match the Path used in SetAuthCookies
+                Path = "/api/auth" // MUST match the Path used in SetAuthCookies
             });
         }
 
