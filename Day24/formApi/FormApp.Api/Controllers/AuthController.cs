@@ -2,6 +2,7 @@
 using formApi.FormApp.Application.Exceptions;
 using formApi.FormApp.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -31,10 +32,8 @@ namespace formApi.FormApp.Api.Controllers
                 SetAuthCookies(result);
                 return Ok(new AuthResponseDto
                 {
-                    AccessToken= result.AccessToken,
                     Role= result.Role,
                     Email = result.Email,
-                    AccessTokenExpiresAt = result.AccessTokenExpiresAt// ISO 8601 format
                 });
             }
             catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
@@ -55,10 +54,8 @@ namespace formApi.FormApp.Api.Controllers
                 // Return non-sensitive info only — don't put tokens in the body anymore
                 return Ok(new AuthResponseDto
                 {
-                    AccessToken = result.AccessToken,
                     Role = result.Role,
                     Email = result.Email,
-                    AccessTokenExpiresAt = result.AccessTokenExpiresAt// ISO 8601 format
                 });
             }
             catch (AuthException ex) { return Unauthorized(new { message = ex.Message }); }
@@ -83,10 +80,8 @@ namespace formApi.FormApp.Api.Controllers
                 SetAuthCookies(result);
                 return Ok(new AuthResponseDto
                 {
-                    AccessToken = result.AccessToken,
                     Role = result.Role,
                     Email = result.Email,
-                    AccessTokenExpiresAt = result.AccessTokenExpiresAt// ISO 8601 format
                 });
             }
             catch (AuthException ex) {
@@ -125,7 +120,11 @@ namespace formApi.FormApp.Api.Controllers
             if (email is null)
                 return Unauthorized();
 
-            return Ok(new { email, role });
+            return Ok(new AuthResponseDto
+            {
+                Role = role,
+                Email=email,
+            });
         }
         private void SetAuthCookies(AuthResultDto result)
         {

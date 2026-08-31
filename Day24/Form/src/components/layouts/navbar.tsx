@@ -2,13 +2,11 @@ import { GraduationCap, LogOut, UserPlus, UserRound } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useLogoutMutation } from "../../features/authApiSlice";
 import {
-  clearCredentials,
   selectAuthEmail,
   selectIsAdmin,
-  selectIsAuthenticated,
+  selectIsAuthenticated
 } from "../../features/authSlice";
-import { studentApi } from "../../features/studentApiSlice";
-import { useAppDispatch, useAppSelector } from "../../hooks/reducer-hook";
+import { useAppSelector } from "../../hooks/reducer-hook";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -27,7 +25,6 @@ function initialsFor(email: string | null): string {
 }
 
 export function Navbar() {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -37,14 +34,8 @@ export function Navbar() {
   const [logout] = useLogoutMutation();
 
   async function handleLogout() {
-    try {
-      await logout().unwrap();
-    } catch {
-    } finally {
-      dispatch(clearCredentials());
-      dispatch(studentApi.util.resetApiState());
-      navigate("/");
-    }
+   await logout();
+  navigate("/");
   }
 
   return (

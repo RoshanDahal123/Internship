@@ -3,8 +3,7 @@ export type UserRole = "Admin";
 
 /** Shape returned by /auth/register, /auth/login, and /auth/refresh — identical on all three. */
 export interface AuthResponse {
-  accessToken: string;
-  accessTokenExpiresAt: string; // ISO string string
+  // ISO string string
   email: string;
   role: UserRole;
 }

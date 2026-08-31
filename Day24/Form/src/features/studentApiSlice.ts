@@ -1,41 +1,12 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
 import type {
   PaginatedStudents,
   Student,
   StudentEntry,
 } from "../types/formTypes";
-import { baseQueryWithReauth } from "../lib/base-query-with-reauth";
+import { baseApi } from "../app/base-api";
 
-export const studentApi = createApi({
-  reducerPath: "studentApi",
-  baseQuery: baseQueryWithReauth,
-  tagTypes: ["StudentEntry"],
+export const studentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // getStudents: builder.infiniteQuery<PaginatedStudents, void, number>({
-    //   infiniteQueryOptions: {
-    //     initialPageParam: 1,
-    //     getNextPageParam: (lastPage) =>
-    //       lastPage.hasNextPage ? lastPage.page + 1 : undefined,
-    //     getPreviousPageParam: (firstPage) =>
-    //       firstPage.page > 1 ? firstPage.page - 1 : undefined,
-    //   },
-    //   query: ({ pageParam }) => `/students?page=${pageParam}&pageSize=10`,
-    //   providesTags: (result) =>
-    //     result
-    //       ? [
-    //           ...result.pages.flatMap((p) =>
-    //             p.items.map((s) => ({
-    //               type: "StudentEntry" as const,
-    //               id: s.id,
-    //             })),
-    //           ),
-    //           { type: "StudentEntry", id: "LIST" },
-    //         ]
-    //       : [{ type: "StudentEntry", id: "LIST" }],
-    // }),
-
-    //genrally infinite query normally means page1->page2(getsadded), so the client has multiple pages added
-    //so the traditionally pagination is usually [previous]page1[next] on click on next [previous]page2[next] so to display one page at a time we use this
     getStudents: builder.query<
       PaginatedStudents,
       { page: number; search?: string }
@@ -46,7 +17,7 @@ export const studentApi = createApi({
           pageSize: "10",
         });
         if (search?.trim()) params.set("search", search.trim());
-        return `/students?${params.toString()}`;
+        return { url: `/students?${params.toString()}` };
       },
       providesTags: (result) =>
         result
@@ -61,14 +32,12 @@ export const studentApi = createApi({
     }),
 
     getStudentById: builder.query<StudentEntry, number>({
-      query: (id) => `/students/${id}`,
+      query: (id) => ({ url: `/students/${id}` }),
       providesTags: (result, error, id) => [{ type: "StudentEntry", id }],
     }),
-    // POST /api/formentries — multipart, because of the CV file
 
     createStudent: builder.mutation<StudentEntry, Student>({
       query: (data) => {
-        console.log(data);
         const multipart = new FormData();
         multipart.append("Name", data.name);
         multipart.append("Email", data.email);
@@ -83,11 +52,10 @@ export const studentApi = createApi({
         if (data.cvFile) {
           multipart.append("CvFile", data.cvFile);
         }
-        console.log(multipart);
         return {
           url: "/students",
           method: "POST",
-          body: multipart,
+          data: multipart,
         };
       },
       invalidatesTags: [{ type: "StudentEntry", id: "LIST" }],
@@ -112,8 +80,7 @@ export const studentApi = createApi({
         if (data.cvFile) {
           multipart.append("CvFile", data.cvFile);
         }
-
-        return { url: `/students/${id}`, method: "PATCH", body: multipart };
+        return { url: `/students/${id}`, method: "PATCH", data: multipart };
       },
       invalidatesTags: (result, error, { id }) => [
         { type: "StudentEntry", id },
@@ -140,11 +107,11 @@ export const studentApi = createApi({
       invalidatesTags: [{ type: "StudentEntry", id: "LIST" }],
     }),
   }),
+  overrideExisting: false,
 });
 
 export const {
   useCreateStudentMutation,
-  // useGetStudentsInfiniteQuery,
   useGetStudentsQuery,
   useGetStudentByIdQuery,
   useUpdateStudentMutation,
